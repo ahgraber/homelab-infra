@@ -1,0 +1,55 @@
+#cloud-config
+# Overwrite default user config
+users:
+  - default #Define a default user
+  - name: ${username}
+    groups: sudo, wheel
+    lock-passwd: false
+    passwd: ${password}
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - ${ssh_pubkey}
+
+timezone: "America/New_York"
+ntp:
+  enabled: true
+  servers:
+    - ${ntp}
+
+package_update: true
+package_upgrade: true
+packages:
+  - acl
+  - apt-transport-https
+  - at
+  - bzip2
+  - curl
+  - debconf
+  - debconf-i18n
+  - git
+  - gnupg
+  - gzip
+  - htop
+  - iproute2
+  - passwd
+  - python
+  - python3-apt
+  - python3-pip
+  - nfs-common
+  - nmap
+  - rsync
+  - sudo
+  - tar
+  - tmux
+  - traceroute
+  - tree
+  - unzip
+  - vim
+  - wget
+  - xz-utils
+
+# final_message: "The system is prepped"
+# power_state:
+#   timeout: 30
+#   mode: reboot

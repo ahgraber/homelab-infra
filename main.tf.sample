@@ -1,0 +1,65 @@
+### ref:
+# https://registry.terraform.io/providers/hashicorp/vsphere/latest/docs/resources/virtual_machine#creating-a-virtual-machine-from-a-template
+# https://registry.terraform.io/providers/hashicorp/vsphere/latest/docs/resources/virtual_machine#cloning-and-customization-example
+# https://github.com/Terraform-VMWare-Modules/terraform-vsphere-vm
+###
+
+terraform {
+  required_providers {
+    vsphere = {
+      source = "hashicorp/vsphere"
+      version = "2.0.2"
+    }
+  }
+}
+
+# Configure the VMware vSphere Provider
+provider "vsphere" {
+  user           = "user@example.com"
+  password       = "changeme!"
+  vsphere_server = "vcenter.example.com"
+
+  # if you have a self-signed cert
+  allow_unverified_ssl = true
+}
+
+# Deploy 2 linux VMs
+module "testVM" {
+  source        = "./modules/terraform-vsphere"
+  # version       = "X.X.X"
+
+  dc            = "datacenter1"
+  vmrp          = "Cluster/Resources/pool01"
+  vmfolder      = "vms"
+  datastore     = "datastore/datastore01"
+  vmtemp        = "template_ubuntu2004_cloudinit"
+
+  instances     = 2
+  vmname        = "test"
+
+  cpu_number      = 4
+  ram_size        = 4096
+  # cpu_hot_add_enabled     = true
+  # memory_hot_add_enabled  = true
+  # disk_label        = "disk0"
+  # disk_size_gb      = 20
+  enable_disk_uuid  = true
+
+  network = {
+    "DPortGrp-k8s" = ["10.42.0.20", "10.42.0.21"] # To use DHCP create Empty list ["",""]
+
+  }
+  ipv4submask = ["24"]
+  domain      = "example.com"
+  vmgateway   = "10.42.0.1"
+
+  enable_logging  = true
+  extra_config = {
+    "guestinfo.userdata" = base64encode(templatefile("cloudinit/userdata.yaml", {
+      username    = "root"
+      password    = base64encode("changeme!"),
+      ssh_pubkey  = "YOUR_SSH_HERE"
+    }))
+    "guestinfo.userdata.encoding" = "base64"
+  }
+}

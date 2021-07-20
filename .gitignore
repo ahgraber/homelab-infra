@@ -1,0 +1,12 @@
+# gitignore
+.terraform/
+*.tfstate*
+*.lock.hcl
+*.zip
+*.ova
+
+modules/terraform-vsphere/
+archive/
+
+main.tf
+govcvars.sh
