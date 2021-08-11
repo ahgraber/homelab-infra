@@ -15,44 +15,9 @@ The second half of this project (deploying a k3s cluster via gitops) is [here](h
 - https://www.hashicorp.com/resources/ansible-terraform-better-together
 - https://github.com/scarolan/ansible-terraform
 
-## Preparation
+## [Preparation](docs/1%20-%20prerequisites.md)
 
-1. [Create VM Images](https://github.com/ahgraber/homelab-packer)
-
-   1. [with Packer](https://github.com/ahgraber/homelab-packer)
-   2. [with cloud-init](./images/vmware%20templates%20with%cloud-init.md)
-
-2. [Download vSphere Terraform module](https://github.com/Terraform-VMWare-Modules/)
-
-   _A convenience script `update_module.sh` is included for use_
-
-   - Downloads and and unzips into ./module/terraform-vsphere.
-   - Updates `./module/terraform-vsphere/main.tf` to include coud-init and ansible hooks
-   - Updates `./module/terraform-vsphere/variables.tf' to include new variables
-
-   ```sh
-   bash ./module/update_module.sh
-   ```
-
-## Customization
-
-1. Create `./main.tf` from [examples](https://github.com/Terraform-VMWare-Modules/) and configure to point to vSphere instance and customize the VM image
-
-2. Update `./cloud-init/userdata.yaml` if needed
-
-   <!-- ### 3. Update `./ansible/playbook.yml` if needed -->
-
-   > [GOVC](https://github.com/vmware/govmomi/tree/master/govc) can help identify names for vSphere resources
-   >
-   > ```sh
-   > export GOVC_URL='https://username:password@vsphere-ip-or-hostname/sdk'
-   > export GOVC_DATACENTER=Homelab
-   > export GOVC_INSECURE=true
-   > # usage: https://github.com/vmware/govmomi/blob/master/govc/USAGE.md
-   > # `govc find -type n` to find networks
-   > # `govc find -type p` to find resource pool path
-   > # `govc find -type s` to find datastore
-   > ```
+## [Customization & Use](docs/2%20-%20terraform.md)
 
 ## Bootstrap
 
