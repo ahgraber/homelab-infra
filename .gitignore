@@ -4,6 +4,8 @@
 *.lock.hcl
 *.zip
 *.ova
+.env
+.envrc
 
 modules/terraform-vsphere/
 archive/

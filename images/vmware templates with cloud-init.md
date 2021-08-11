@@ -115,23 +115,23 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
    sudo apt install open-vm-tools -y
    sudo apt upgrade -y
    sudo apt autoremove -y
-
+   
    # cleans out all of the cloud-init cache, disable and remove cloud-init customisations
    sudo cloud-init clean --logs
    sudo touch /etc/cloud/cloud-init.disabled
    sudo rm -rf /etc/netplan/50-cloud-init.yaml
    sudo apt purge cloud-init -y
    sudo apt autoremove -y
-
+   
    # Don't clear /tmp
    sudo sed -i 's/D \/tmp 1777 root root -/#D \/tmp 1777 root root -/g' /usr/lib/tmpfiles.d/tmp.conf
-
+   
    # Remove cloud-init and rely on dbus for open-vm-tools
    sudo sed -i 's/Before=cloud-init-local.service/After=dbus.service/g' /lib/systemd/system/open-vm-tools.service
-
+   
    # cleanup current ssh keys so templated VMs get fresh key
    sudo rm -f /etc/ssh/ssh_host_*
-
+   
    # add check for ssh keys on reboot...regenerate if neccessary
    sudo tee /etc/rc.local > /dev/null << EOL
    #!/bin/sh -e
@@ -145,25 +145,25 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
    # In order to enable or disable this script just change the execution
    # bits.
    #
-
+   
    # By default this script does nothing.
    test -f /etc/ssh/ssh_host_dsa_key || dpkg-reconfigure openssh-server
    exit 0
    EOL
-
+   
    # make the script executable
    sudo chmod +x /etc/rc.local
-
+   
    # cleanup apt
    sudo apt clean
-
+   
    # reset the machine-id (DHCP leases in 18.04 are generated based on this... not MAC...)
    echo "" | sudo tee /etc/machine-id > /dev/null
-
+   
    # disable swap for K8s
    sudo swapoff --all
    sudo sed -ri '/\sswap\s/s/^#?/#/' /etc/fstab
-
+   
    # Apply updates and cleanup Apt cache
    # packer build --var-file=variables.json ubuntu-2004.json
    apt-get update
@@ -171,25 +171,25 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
    apt-get -y autoremove
    apt-get -y clean
    apt-get install docker.io -y
-
+   
    # Disable swap - generally recommended for K8s, but otherwise enable it for other workloads
    echo "Disabling Swap"
    swapoff -a
    sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
-
+   
    # Reset the machine-id value. This has known to cause issues with DHCP
    #
    echo "Reset Machine-ID"
    truncate -s 0 /etc/machine-id
    rm /var/lib/dbus/machine-id
    ln -s /etc/machine-id /var/lib/dbus/machine-id
-
+   
    # Reset any existing cloud-init state
    #
    echo "Reset Cloud-Init"
    rm /etc/cloud/cloud.cfg.d/*.cfg
    cloud-init clean -s -l
-
+   
    # cleanup shell history and shutdown for templating
    history -c
    history -w
