@@ -21,23 +21,23 @@ The second half of this project (deploying a k3s cluster via gitops) is [here](h
 
 ## Bootstrap
 
-1. Run terraform commands
+Once customization is complete:
 
-   ```sh
-   terraform init
-   terraform plan
-   terraform apply # accept with `yes`
-   ```
+```sh
+terraform init
+terraform plan
+terraform apply # accept with `yes`
+```
 
 ## Update
 
 _**NOTE**_: Terraform expects it will be used to manage all infrastructure changes.  To update currently 'managed' deployment, update `main.tf`.
 
-   ```sh
-   # 'plan' will warn if the change will require destroying/reprovisioning a replacement host
-   terraform plan  
-   terraform apply
-   ```
+```sh
+# 'plan' will warn if the change will require destroying/reprovisioning a replacement host
+terraform plan  
+terraform apply
+```
 
 ## Destroy
 
