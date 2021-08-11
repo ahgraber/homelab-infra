@@ -31,11 +31,13 @@ The second half of this project (deploying a k3s cluster via gitops) is [here](h
 
 ## Update
 
-_**NOTE**_: Terraform expects it will be used to manage all infrastructure changes.
-To update currently 'managed' deployment:
+_**NOTE**_: Terraform expects it will be used to manage all infrastructure changes.  To update currently 'managed' deployment, update `main.tf`.
 
-1. Run `terraform plan` against the updated `main.tf` file. _`plan` will warn if the change will require destroying/reprovisioning a replacement host_
-2. Run `terraform apply` to execute
+   ```sh
+   # 'plan' will warn if the change will require destroying/reprovisioning a replacement host
+   terraform plan  
+   terraform apply
+   ```
 
 ## Destroy
 
