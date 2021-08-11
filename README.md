@@ -1,4 +1,5 @@
 # **Bootstrap k3s cluster hosts with vSphere, Terraform, and Ansible**
+
 See: https://github.com/Terraform-VMWare-Modules/terraform-vsphere-vm
 
 Use Terraform to provision VMs in vsphere and call ansible to configure hosts.
@@ -6,17 +7,18 @@ The second half of this project (deploying a k3s cluster via gitops) is [here](h
 
 ## References
 
-* https://github.com/blackjid/homelab-infra
-* https://floating.io/2019/04/iaas-terraform-and-vsphere/
-* https://github.com/reschouw/terraform-vsphere
-* https://garyflynn.com/technology/hashicorp/create-your-first-vsphere-terraform-configuration/
+- https://github.com/blackjid/homelab-infra
+- https://floating.io/2019/04/iaas-terraform-and-vsphere/
+- https://github.com/reschouw/terraform-vsphere
+- https://garyflynn.com/technology/hashicorp/create-your-first-vsphere-terraform-configuration/
 
-* https://www.hashicorp.com/resources/ansible-terraform-better-together
-* https://github.com/scarolan/ansible-terraform
+- https://www.hashicorp.com/resources/ansible-terraform-better-together
+- https://github.com/scarolan/ansible-terraform
 
 ## Preparation
 
 1. [Create VM Images](https://github.com/ahgraber/homelab-packer)
+
    1. [with Packer](https://github.com/ahgraber/homelab-packer)
    2. [with cloud-init](./images/vmware%20templates%20with%cloud-init.md)
 
@@ -24,9 +26,9 @@ The second half of this project (deploying a k3s cluster via gitops) is [here](h
 
    _A convenience script `update_module.sh` is included for use_
 
-   * Downloads and and unzips into ./module/terraform-vsphere.
-   * Updates `./module/terraform-vsphere/main.tf` to include coud-init and ansible hooks
-   * Updates `./module/terraform-vsphere/variables.tf' to include new variables
+   - Downloads and and unzips into ./module/terraform-vsphere.
+   - Updates `./module/terraform-vsphere/main.tf` to include coud-init and ansible hooks
+   - Updates `./module/terraform-vsphere/variables.tf' to include new variables
 
    ```sh
    bash ./module/update_module.sh
@@ -39,6 +41,7 @@ The second half of this project (deploying a k3s cluster via gitops) is [here](h
 2. Update `./cloud-init/userdata.yaml` if needed
 
    <!-- ### 3. Update `./ansible/playbook.yml` if needed -->
+
    > [GOVC](https://github.com/vmware/govmomi/tree/master/govc) can help identify names for vSphere resources
    >
    > ```sh
@@ -58,7 +61,7 @@ The second half of this project (deploying a k3s cluster via gitops) is [here](h
    ```sh
    terraform init
    terraform plan
-   terraform apply  # accept with `yes`
+   terraform apply # accept with `yes`
    ```
 
 ## Update
@@ -66,7 +69,7 @@ The second half of this project (deploying a k3s cluster via gitops) is [here](h
 _**NOTE**_: Terraform expects it will be used to manage all infrastructure changes.
 To update currently 'managed' deployment:
 
-1. Run `terraform plan` against the updated `main.tf` file.  _`plan` will warn if the change will require destroying/reprovisioning a replacement host_
+1. Run `terraform plan` against the updated `main.tf` file. _`plan` will warn if the change will require destroying/reprovisioning a replacement host_
 2. Run `terraform apply` to execute
 
 ## Destroy
@@ -74,5 +77,5 @@ To update currently 'managed' deployment:
 To tear down terraform-managed infra, run:
 
 ```sh
-terraform destroy  # accept with `yes`
+terraform destroy # accept with `yes`
 ```

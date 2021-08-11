@@ -3,7 +3,7 @@ VERSIONTAG="v3.2.0"
 
 # check we're in `module` folder
 if [[ $(basename $(pwd)) != "module" ]]; then
-    cd "$(dirname "$0")"
+  cd "$(dirname "$0")"
 fi
 
 ##############################################################################
@@ -48,8 +48,8 @@ mv ./terraform-vsphere* terraform-vsphere
 ##############################################################################
 ### Add/Update variables file                                              ###
 ##############################################################################
-echo "Adding new variables to `variables.tf`"
-cat <<EOF >> ./terraform-vsphere/variables.tf
+echo "Adding new variables to $(variables.tf)"
+cat << EOF >> ./terraform-vsphere/variables.tf
 
 ### User config
 variable "username" {

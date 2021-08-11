@@ -3,12 +3,12 @@
 `cloud-init` relies, for our purposes, on one file called `user-data` –
 It general, it can also include a `meta-data file`, but that is handled in vSphere’s case by the customisation specs.
 
-## Referemces:
+## References:
 
-* https://blah.cloud/infrastructure/using-cloud-init-for-vm-templating-on-vsphere/
-* https://github.com/vmware/cloud-init-vmware-guestinfo
-* https://vmsysadmin.wordpress.com/2019/09/20/cloning-ubuntu-18-04-lts-cloud-image-on-vmware-using-cloud-init/
-* https://blog.linoproject.net/cloud-init-with-terraform-in-vsphere-environment/
+- https://blah.cloud/infrastructure/using-cloud-init-for-vm-templating-on-vsphere/
+- https://github.com/vmware/cloud-init-vmware-guestinfo
+- https://vmsysadmin.wordpress.com/2019/09/20/cloning-ubuntu-18-04-lts-cloud-image-on-vmware-using-cloud-init/
+- https://blog.linoproject.net/cloud-init-with-terraform-in-vsphere-environment/
 
 ## Instructions
 
@@ -17,7 +17,7 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
 2. Create `govcvars.sh`
 
    ```sh
-   cat > govcvars.sh <<EOF
+   cat > govcvars.sh << EOF
    export GOVC_INSECURE=1                              # Don't verify SSL certs on vCenter
    export GOVC_URL=10.198.16.4                         # vCenter IP/FQDN
    export GOVC_USERNAME=administrator@vsphere.local    # vCenter username
@@ -36,16 +36,17 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
    > export GOVC_DATACENTER=Homelab
    > export GOVC_INSECURE=true
    > # usage: https://github.com/vmware/govmomi/blob/master/govc/USAGE.md
-   > govc find -type n  # to find networks
-   > govc find -type p  # to find resource pool path
-   > govc find -type s  # to find datastore
+   > govc find -type n # to find networks
+   > govc find -type p # to find resource pool path
+   > govc find -type s # to find datastore
    > ```
 
 3. Run `source govcvars.sh`
 
 4. Download cloud image
-   * [Ubuntu 10.04](https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.ova)
-   * [Ubuntu 20.04](https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.ova)
+
+   - [Ubuntu 10.04](https://cloud-images.ubuntu.com/releases/18.04/release/ubuntu-18.04-server-cloudimg-amd64.ova)
+   - [Ubuntu 20.04](https://cloud-images.ubuntu.com/releases/20.04/release/ubuntu-20.04-server-cloudimg-amd64.ova)
 
 5. Extract image (this will output the spec to a file in your current directory called ubuntu.json):
 
@@ -55,23 +56,23 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
 
 6. Customize the `ubuntu.json` spec:
 
-   * `hostname`
-   * `Network` - default network / dportgroup
-   * `Name` - template name for vSphere
-   * `user-data` - other user data in cloud-init format:
+   - `hostname`
+   - `Network` - default network / dportgroup
+   - `Name` - template name for vSphere
+   - `user-data` - other user data in cloud-init format:
 
      ```yaml
      ### cloud-init user-data
      groups:
-     - docker
+       - docker
      users:
-     - default
-     - name: ubuntu
-       ssh-authorized-keys:
-         - ssh-rsa ...
-       sudo: ALL=(ALL) NOPASSWD:ALL
-       groups: sudo, docker
-       shell: /bin/bash
+       - default
+       - name: ubuntu
+         ssh-authorized-keys:
+           - ssh-rsa ...
+         sudo: ALL=(ALL) NOPASSWD:ALL
+         groups: sudo, docker
+         shell: /bin/bash
 
      apt:
      sources:
@@ -87,10 +88,10 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
      package_upgrade: true
      package_update: true
      packages:
-     - curl
-     - unzip
-     - wget
-     -
+       - curl
+       - unzip
+       - wget
+       -
      ```
 
 7. Deploy the OVA [and optionally apply additional customization]:
@@ -132,7 +133,7 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
    sudo rm -f /etc/ssh/ssh_host_*
 
    # add check for ssh keys on reboot...regenerate if neccessary
-   sudo tee /etc/rc.local >/dev/null <<EOL
+   sudo tee /etc/rc.local > /dev/null << EOL
    #!/bin/sh -e
    #
    # rc.local
@@ -157,7 +158,7 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
    sudo apt clean
 
    # reset the machine-id (DHCP leases in 18.04 are generated based on this... not MAC...)
-   echo "" | sudo tee /etc/machine-id >/dev/null
+   echo "" | sudo tee /etc/machine-id > /dev/null
 
    # disable swap for K8s
    sudo swapoff --all
@@ -165,7 +166,8 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
 
    # Apply updates and cleanup Apt cache
    # packer build --var-file=variables.json ubuntu-2004.json
-   apt-get update ; apt-get -y dist-upgrade
+   apt-get update
+   apt-get -y dist-upgrade
    apt-get -y autoremove
    apt-get -y clean
    apt-get install docker.io -y
@@ -202,15 +204,15 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
 
 9. Edit/update _variables.json_ and _ubuntu-##.json_ with info for local ESXi
 
-    ```sh
-    export GOVC_URL='https://username:password@vsphere-ip-or-hostname/sdk'
-    export GOVC_DATACENTER=Homelab
-    export GOVC_INSECURE=true
-    # usage: https://github.com/vmware/govmomi/blob/master/govc/USAGE.md
-    # `govc find -type n` to find networks
-    # `govc find -type p` to find resource pool path
-    # `govc find -type s` to find datastore
-    ```
+   ```sh
+   export GOVC_URL='https://username:password@vsphere-ip-or-hostname/sdk'
+   export GOVC_DATACENTER=Homelab
+   export GOVC_INSECURE=true
+   # usage: https://github.com/vmware/govmomi/blob/master/govc/USAGE.md
+   # `govc find -type n` to find networks
+   # `govc find -type p` to find resource pool path
+   # `govc find -type s` to find datastore
+   ```
 
 10. Build image (auto push to ESXi vSphere):
 
@@ -218,6 +220,6 @@ It general, it can also include a `meta-data file`, but that is handled in vSphe
     packer build -var-file=variables.json ubuntu-##.json
     ```
 
-    * If error, may have to edit _ubuntu-##.json_ with current MD5/SHAsum and iso URL
+    - If error, may have to edit _ubuntu-##.json_ with current MD5/SHAsum and iso URL
 
 11. Delete Rancher-Packer repo
