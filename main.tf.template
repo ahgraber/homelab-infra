@@ -42,7 +42,7 @@ module "k3s" {
   # cpu_hot_add_enabled     = true
   # memory_hot_add_enabled  = true
   # disk_label        = "disk0"
-  disk_size_gb      = [40]
+  disk_size_gb      = [32]
   enable_disk_uuid  = true
 
   network = {
