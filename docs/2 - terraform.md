@@ -67,18 +67,13 @@
 
 4. Update `main.tf.template` template file with non-secret info (machine specs, IP addresses. etc)
 
-5. Substitute environmental variables into template
+5. Source environmental variables
 
    ```zsh
    # reload all env variables
    direnv allow .
 
-   # substitute environmental variables
-   # ">!" allows overwrite on zsh
-   envsubst < ./main.tf.template >! ./main.tf
    ```
-
-6. Update `./cloud-init/userdata.yaml` to provide additional image customization if needed.
 
 ## Bootstrap
 

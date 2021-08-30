@@ -84,16 +84,4 @@ govc find -type s
 
 ## [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
-<!-- Review [Download vSphere Terraform module](https://github.com/Terraform-VMWare-Modules/)
-
-_A convenience script `update_module.sh` is included for use:_
-
-- Downloads and and unzips into ./module/terraform-vsphere.
-- Updates `./module/terraform-vsphere/main.tf` to include coud-init and ansible hooks
-- Updates `./module/terraform-vsphere/variables.tf' to include new variables
-
-```sh
-bash ./module/update_module.sh
-``` -->
-
 ## [VM Images](https://github.com/ahgraber/homelab-packer)

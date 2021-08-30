@@ -13,6 +13,6 @@ kubeconfig
 modules/terraform-vsphere/
 archive/
 
-main.tf
+# main.tf  # allowing because all secrets are in .envrc
 govcvars.sh
 host.ini
