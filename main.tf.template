@@ -59,7 +59,7 @@ module "k3s" {
     "guestinfo.userdata" = base64encode(templatefile("cloudinit/userdata.yaml", {
       username    = "${NODE_USER}"
       password    = base64encode("${NODE_PASS}"),
-      ssh_pubkey  = "${NODE_SSHKEY}"
+      ssh_pubkey  = "${SSH_ID}"
       ntp         = "10.2.0.1"
     }))
     "guestinfo.userdata.encoding" = "base64"

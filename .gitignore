@@ -6,9 +6,13 @@
 *.ova
 .env
 .envrc
+kubeconfig
+# vscode-sops
+.decrypted~*.yaml
 
 modules/terraform-vsphere/
 archive/
 
 main.tf
 govcvars.sh
+host.ini

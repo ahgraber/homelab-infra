@@ -1,4 +1,4 @@
-# **Bootstrap k3s cluster hosts with vSphere, Terraform, and Ansible**
+# Bootstrap k3s cluster hosts with vSphere and Terraform
 
 See: https://github.com/Terraform-VMWare-Modules/terraform-vsphere-vm
 
@@ -26,8 +26,10 @@ Once customization is complete:
 ```sh
 terraform init
 terraform plan
-terraform apply # accept with `yes`
+terraform apply  # -auto-approve
 ```
+
+_In OPNsense, set Unbound DNS overrides to IP address and node name of terraform'd nodes_
 
 ## Update
 
@@ -35,8 +37,8 @@ _**NOTE**_: Terraform expects it will be used to manage all infrastructure chang
 
 ```sh
 # 'plan' will warn if the change will require destroying/reprovisioning a replacement host
-terraform plan  
-terraform apply
+terraform plan
+terraform apply  # -auto-approve
 ```
 
 ## Destroy
@@ -44,5 +46,5 @@ terraform apply
 To tear down terraform-managed infra, run:
 
 ```sh
-terraform destroy # accept with `yes`
+terraform destroy  # -auto-approve
 ```

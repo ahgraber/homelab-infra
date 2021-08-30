@@ -37,23 +37,30 @@
    export GOVC_INSECURE=true
 
    # vars for 'main.tf'
-   export VSPHERE_USER="user@example.com"
-   export VSPHERE_USER_PASS="changeme!"
-   export VSPHERE_SERVER="vsphere.example.com"
-   export VSPHERE_DC="Homelab"
-   export VSPHERE_VMRP="Cluster/Resources/RG"
-   export VSPHERE_VMFOLDER="vms"
-   export VSPHERE_DATASTORE="datastore/vms"
-   # export VSPHERE_VMTEMPLATE="template_ubuntu2004_nodhcp"
-   export VSPHERE_PORTGROUP="DPortGroup"
+   export TF_VAR_VSPHERE_USER="administrator@example.com"
+   export TF_VAR_VSPHERE_USER_PASS="changeme"
+   export TF_VAR_VSPHERE_SERVER="vcenter.example.com"
+   export TF_VAR_VSPHERE_DC=""
+   export TF_VAR_VSPHERE_VMRP="Cluster/Resources/poolname"
+   export TF_VAR_VSPHERE_VMFOLDER="folderna e"
+   export TF_VAR_VSPHERE_DATASTORE="datastore/dsname"
+   export TF_VAR_VSPHERE_VMTEMPLATE="ubuntu_2004-k8s-nodhcp"
+   export TF_VAR_VSPHERE_PORTGROUP="DPortGrp-name"
+   export TF_VAR_DNS='["10.42.42.1", "10.42.42.2"]'
+   export TF_VAR_DOMAIN="example.com"
+   export TF_VAR_GATEWAY="10.42.42.1"
 
-   export DNS="['1.1.1.1', '8.8.8.8']"
-   export DOMAIN="example.com"
-   # export GATEWAY="10.2.0.1"
+   export TF_VAR_CTRL_IPs='["10.42.42.10", "10.42.42.11", "10.42.42.12"]'
+   export TF_VAR_WORK_IPs='["10.42.42.30", "10.42.42.31", "10.42.42.32"]'
+   export TF_VAR_KUBE_VIP="10.42.42.42"
 
-   export NODE_USER="user"
-   export NODE_PASS="changeme"
-   export NODE_SSHKEY="ssh-rsa ImAnSSHKey123== ahgraber@ninerealmlabs.com"
+   export TF_VAR_NODE_USER="username"
+   export TF_VAR_NODE_PASS="changeme"
+   export TF_VAR_SSH_ID="ssh-rsa IamANsshKey12345== administrator@example.com
+
+   export TF_VAR_ANSIBLE_HOSTS_FILE="./ansible/inventory/cluster/host.ini"
+   export TF_VAR_ANSIBLE_PLAYBOOK_DIR="./ansible/playbooks"
+   export TF_VAR_KUBECONFIG=$(expand_path ./kubeconfig)
 
    EOF
    ```
@@ -71,7 +78,7 @@
    envsubst < ./main.tf.template >! ./main.tf
    ```
 
-6. Update `./cloud-init/userdata.yaml` if needed
+6. Update `./cloud-init/userdata.yaml` to provide additional image customization if needed.
 
 ## Bootstrap
 
@@ -80,7 +87,7 @@
    ```sh
    terraform init
    terraform plan
-   terraform apply # accept with `yes`
+   terraform apply  # -auto-approve
    ```
 
 ## Update
@@ -96,5 +103,5 @@ To update currently 'managed' deployment:
 To tear down terraform-managed infra, run:
 
 ```sh
-terraform destroy # accept with `yes`
+terraform destroy  # -auto-approve
 ```

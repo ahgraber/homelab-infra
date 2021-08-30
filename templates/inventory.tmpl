@@ -1,0 +1,17 @@
+[controller]
+%{ for index, hostname in controller_hostnames ~}
+${ hostname } ansible_host=${ controller_ips[index] }
+%{ endfor ~}
+
+[worker]
+%{ for index, hostname in worker_hostnames ~}
+${ hostname } ansible_host=${ worker_ips[index] }
+%{ endfor ~}
+
+[kubernetes:children]
+controller
+worker
+
+[kubernetes:vars]
+ansible_user=${ node_user }
+kubevip_address=${ kube_vip }

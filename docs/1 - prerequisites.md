@@ -26,7 +26,7 @@ git ls-files -i --exclude-from=.gitignore | xargs git rm --cached
 
 # set up direnv config to whitelist folders for direnv
 mkdir -p ~/.config/direnv
-cat > ~/.config/direnv/direnv2.toml << EOF
+cat > ~/.config/direnv/direnv.toml << EOF
 [whitelist]
 prefix = [ "/path/to/folders/to/whitelist" ]
 exact = [ "/path/to/envrc/to/whitelist" ]
@@ -67,24 +67,33 @@ govc find -type p
 govc find -type s
 ```
 
-## Terraform
+## Ansible
 
-1. Install [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
-2. [Download vSphere Terraform module](https://github.com/Terraform-VMWare-Modules/)
-
-   _A convenience script `update_module.sh` is included for use_
-
-   - Downloads and and unzips into ./module/terraform-vsphere.
-   - Updates `./module/terraform-vsphere/main.tf` to include coud-init and ansible hooks
-   - Updates `./module/terraform-vsphere/variables.tf' to include new variables
+1. Install [ansible](https://docs.ansible.com/ansible/latest/index.html)
+2. Update Ansible requirements
 
    ```sh
-   bash ./module/update_module.sh
+   ansible-galaxy install -r ./ansible/requirements.yml --force
    ```
 
-## VM Images
+3. Update python requirements
 
-1. [Create VM Images](https://github.com/ahgraber/homelab-packer)
+   ```sh
+   pip3 install -r ./ansible/requirements.txt
+   ```
 
-   1. [with Packer (preferred)](https://github.com/ahgraber/homelab-packer)
-   2. [with cloud-init](./images/vmware%20templates%20with%cloud-init.md)
+## [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
+
+<!-- Review [Download vSphere Terraform module](https://github.com/Terraform-VMWare-Modules/)
+
+_A convenience script `update_module.sh` is included for use:_
+
+- Downloads and and unzips into ./module/terraform-vsphere.
+- Updates `./module/terraform-vsphere/main.tf` to include coud-init and ansible hooks
+- Updates `./module/terraform-vsphere/variables.tf' to include new variables
+
+```sh
+bash ./module/update_module.sh
+``` -->
+
+## [VM Images](https://github.com/ahgraber/homelab-packer)
