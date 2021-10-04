@@ -44,3 +44,5 @@ k3s_server:
     - "anonymous-auth=true"
   # node-label:
   #   - "node-role.kubernetes.io/master=true"
+  node-taint:
+    - "node-role.kubernetes.io/master=true:NoSchedule"
