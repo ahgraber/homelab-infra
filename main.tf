@@ -40,6 +40,8 @@ variable "SSH_ID" {}
 variable "ANSIBLE_HOSTS_FILE" {}
 variable "ANSIBLE_PLAYBOOK_DIR" {}
 variable "KUBECONFIG" {}
+variable "KUBERNETES_OIDC_ISSUER" {}
+variable "KUBERNETES_OIDC_CLIENTID" {}
 
 # Configure the VMware vSphere Provider
 provider "vsphere" {
@@ -134,12 +136,15 @@ resource "local_file" "ansible_hosts" {
   depends_on = [module.controllers, module.workers]
   content = templatefile("./templates/inventory.tmpl",
     {
-      controller_hostnames = module.controllers.VM,
-      controller_ips       = module.controllers.ip,
-      worker_hostnames     = module.workers.VM,
-      worker_ips           = module.workers.ip,
-      node_user            = var.NODE_USER,
-      kube_vip             = var.KUBE_VIP
+      controller_hostnames    = module.controllers.VM,
+      controller_ips          = module.controllers.ip,
+      worker_hostnames        = module.workers.VM,
+      worker_ips              = module.workers.ip,
+      node_user               = var.NODE_USER,
+      kube_vip                = var.KUBE_VIP
+      cluster_domain          = var.DOMAIN
+      kubernetes_oidc_issuer  = var.KUBERNETES_OIDC_ISSUER
+      kubernetes_oidc_clientid= var.KUBERNETES_OIDC_CLUSTERID
     }
   )
   filename = "./ansible/inventory/cluster/host.ini"

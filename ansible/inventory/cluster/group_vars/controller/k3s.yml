@@ -41,7 +41,13 @@ k3s_server:
     - "bind-address=0.0.0.0"
   etcd-expose-metrics: true
   kube-apiserver-arg:
-    - "anonymous-auth=true"
+    - "anonymous-auth=false"
+    - "oidc-issuer-url={{ kubernetes_oidc_issuer }}"
+    - "oidc-client-id={{ kubernetes_oidc_clientid }}"
+    # - "oidc-issuer-url=https://keycloak.{{ cluster_domain }}/auth/realms/{{ cluster_domain|replace('.com','') }}"
+    # - "oidc-client-id=kubernetes"
+    - "oidc-username-claim=email"
+    - "oidc-groups-claim=groups"
   # node-label:
   #   - "node-role.kubernetes.io/master=true"
   node-taint:

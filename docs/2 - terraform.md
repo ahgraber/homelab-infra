@@ -77,13 +77,18 @@
 
 ## Bootstrap
 
-1. Run terraform commands
+Run terraform commands
 
-   ```sh
-   terraform init
-   terraform plan
-   terraform apply  # -auto-approve
-   ```
+```sh
+terraform init
+terraform plan
+terraform apply  # -auto-approve
+```
+
+Terraform will
+
+1. Provision VMs on vSphere
+2. Create a hosts.ini file based on [inventory.tmpl](../templates/inventory.tmpl) which is then used by Ansible
 
 ## Update
 
