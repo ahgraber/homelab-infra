@@ -15,4 +15,4 @@ archive/
 
 # main.tf  # allowing because all secrets are in .envrc
 govcvars.sh
-host.ini
+hosts.ini
