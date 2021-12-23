@@ -22,7 +22,8 @@
    EOF
    ```
 
-2. Review `./main.tf.template` and [module examples](https://github.com/Terraform-VMWare-Modules/) and customize configuration as needed. Remember that we'll substitute secret environmental variables in.
+2. Review `./main.tf.template` and [module examples](https://github.com/Terraform-VMWare-Modules/)
+   and customize configuration as needed. Remember that we'll substitute secret environmental variables in.
 
 3. Update `.envrc` with secrets
 
@@ -95,7 +96,8 @@ Terraform will
 _**NOTE**_: Terraform expects it will be used to manage all infrastructure changes.
 To update currently 'managed' deployment:
 
-1. Run `terraform plan` against the updated `main.tf` file. _`plan` will warn if the change will require destroying/reprovisioning a replacement host_
+1. Run `terraform plan` against the updated `main.tf` file. _`plan` will warn if the change will require_
+   _destroying/reprovisioning a replacement host_
 2. Run `terraform apply` to execute
 
 ## Destroy

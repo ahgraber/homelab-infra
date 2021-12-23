@@ -4,7 +4,8 @@ A global prerequisite is the existence of a VMWare vSphere ESXi host/cluster man
 
 ## direnv
 
-It is advisable to install [direnv](https://github.com/direnv/direnv) to persist environmental variables to a hidden `.envrc` file.
+It is advisable to install [direnv](https://github.com/direnv/direnv) to persist
+environmental variables to a hidden `.envrc` file.
 
 After direnv is installed, set up on the local repo path:
 
@@ -39,7 +40,8 @@ direnv reload
 
 [`govc`](https://github.com/vmware/govmomi/tree/master/govc) is a vSphere CLI built on top of govmomi.
 
-The CLI is designed to be a user friendly CLI alternative to the GUI and well suited for automation tasks. It also acts as a test harness for the govmomi APIs and provides working examples of how to use the APIs.
+The CLI is designed to be a user friendly CLI alternative to the GUI and well suited for automation tasks.
+It also acts as a test harness for the govmomi APIs and provides working examples of how to use the APIs.
 
 We will use it to identify names of vSphere resources
 

@@ -1,0 +1,20 @@
+---
+ignore: |
+  .vscode/
+extends: default
+rules:
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 0
+  comments:
+    min-spaces-from-content: 1
+  indentation: enable
+  line-length: disable
+  # quoted-strings:
+  #   quote-type: any
+  #   required: only-when-needed
+  # truthy:
+  #   allowed-values: ['true', 'false']
