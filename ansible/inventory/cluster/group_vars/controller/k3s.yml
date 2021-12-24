@@ -14,12 +14,12 @@ k3s_server:
     # # if different from kubevip_address
     # - "{{ k3s_registration_address }}"
   docker: false
-  flannel-backend: "vxlan"  # "none" # This needs to be in quotes
+  flannel-backend: "vxlan" # "none" # This needs to be in quotes
   disable:
-    - traefik
-    - servicelb
-    # - metrics-server
     # - local-storage
+    - metrics-server # managed with flux
+    - servicelb # use metallb
+    - traefik # managed with flux
   # disable-network-policy: true
   # disable-cloud-controller: true
   write-kubeconfig-mode: "644"
@@ -42,12 +42,11 @@ k3s_server:
   etcd-expose-metrics: true
   kube-apiserver-arg:
     - "anonymous-auth=false"
-    - "oidc-issuer-url={{ kubernetes_oidc_issuer }}"
-    - "oidc-client-id={{ kubernetes_oidc_clientid }}"
-    # - "oidc-issuer-url=https://keycloak.{{ cluster_domain }}/auth/realms/{{ cluster_domain|replace('.com','') }}"
-    # - "oidc-client-id=kubernetes"
-    - "oidc-username-claim=email"
-    - "oidc-groups-claim=groups"
+    # - "oidc-issuer-url={{ kubernetes_oidc_issuer }}"
+    # - "oidc-client-id={{ kubernetes_oidc_clientid }}"
+
+    # - "oidc-username-claim=email"
+    # - "oidc-groups-claim=groups"
   # node-label:
   #   - "node-role.kubernetes.io/master=true"
   node-taint:
