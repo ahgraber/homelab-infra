@@ -97,13 +97,13 @@
 - name: Render default cloudinit meta-data
   template:
     src: meta-data.j2
-    dest: "{{ playbook_dir }}/data/files/cloud-init/meta-data"
+    dest: "{{ role_path }}/data/files/cloud-init/meta-data"
     mode: 0644
 
 - name: Render default cloudinit user-data
   template:
     src: generic-user-data.j2
-    dest: "{{ playbook_dir }}/data/files/cloud-init/user-data"
+    dest: "{{ role_path }}/data/files/cloud-init/user-data"
     mode: 0644
 
 # - name: Render machine specific init config
