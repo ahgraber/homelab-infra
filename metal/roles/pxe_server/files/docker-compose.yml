@@ -10,12 +10,13 @@ services:
     build: ./tftp
     network_mode: host
     volumes:
-      - ./data/init-config/meta-data:/var/lib/tftpboot/meta-data
-      - ./data/init-config/user-data:/var/lib/tftpboot/user-data
+      - ./data/cloud-init/meta-data:/var/lib/tftpboot/meta-data
+      - ./data/cloud-init/user-data:/var/lib/tftpboot/user-data
       - ./data/pxe-config/grub.cfg:/var/lib/tftpboot/grub.cfg
+      - ./data/pxe-config/grubnetx64.efi.signed:/var/lib/tftpboot/grubnetx64.efi
       - ./data/iso/:/var/lib/tftpboot/iso/
-      - ./data/os/EFI/BOOT/BOOTx64.EFI:/var/lib/tftpboot/BOOTx64.EFI
-      - ./data/os/EFI/BOOT/grubx64.efi:/var/lib/tftpboot/grubx64.efi
+      # - ./data/os/EFI/BOOT/BOOTx64.EFI:/var/lib/tftpboot/BOOTx64.EFI
+      # - ./data/os/EFI/BOOT/grubx64.efi:/var/lib/tftpboot/grubx64.efi
       - ./data/os/casper/initrd:/var/lib/tftpboot/initrd
       - ./data/os/casper/vmlinuz:/var/lib/tftpboot/vmlinuz
       # - ./data/os/images/pxeboot/initrd.img:/var/lib/tftpboot/initrd.img
@@ -26,6 +27,6 @@ services:
     network_mode: host
     volumes:
       - ./data/os:/usr/share/nginx/html/os
-      - ./data/init-config/:/usr/share/nginx/html/init-config
+      - ./data/cloud-init/:/usr/share/nginx/html/cloud-init
     environment:
       NGINX_PORT: 80

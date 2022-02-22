@@ -31,6 +31,18 @@
 # - debug: msg="item.item={{item.item}}, item.stdout={{item.stdout}}"
 #   with_items: "{{envrc.results}}"
 
+- name: Ensure folder structure exists
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ role_path }}/files/"
+    - "{{ role_path }}/files/data/"
+    - "{{ role_path }}/files/data/cloud-init/"
+    - "{{ role_path }}/files/data/iso/"
+    - "{{ role_path }}/files/data/os/"
+    - "{{ role_path }}/files/data/pxe-config/"
+
 - name: Download ISO
   get_url:
     url: "{{ iso_url }}"
@@ -43,6 +55,14 @@
   command:
     cmd: "xorriso -osirrox on -indev {{ iso.dest }} -extract / {{ role_path }}/files/data/os"
     creates: "{{ role_path }}/files/data/os/.treeinfo"
+
+# ref: https://askubuntu.com/questions/1235723/automated-20-04-server-installation-using-pxe-and-live-server-image
+- name: Download signed grub netboot EFI
+  get_url:
+    url: "http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/uefi/grub2-amd64/current/grubnetx64.efi.signed"
+    dest: "{{ role_path }}/files/data/pxe-config/grubnetx64.efi.signed"
+    checksum: "sha256:442a13ce54100d4f51b1ec68d495a6eacf9fd06b862ed3ed51ec5ae159f18f84"
+  # register: efi
 
 # chmod -R +w iso {{ role_path }}/files/data/os
 
@@ -64,13 +84,26 @@
 - name: Render DHCP config
   template:
     src: dhcpd.conf.j2
-    dest: "{{ role_path }}/files/data/pxe-config/dhcpd.conf"
+    # dest: "{{ role_path }}/files/data/pxe-config/dhcpd.conf"
+    dest: "{{ role_path }}/files/dhcp/dhcpd.conf"
     mode: 0644
 
 - name: Render GRUB config
   template:
     src: grub.cfg.j2
     dest: "{{ role_path }}/files/data/pxe-config/grub.cfg"
+    mode: 0644
+
+- name: Render default cloudinit meta-data
+  template:
+    src: meta-data.j2
+    dest: "{{ playbook_dir }}/data/files/cloud-init/meta-data"
+    mode: 0644
+
+- name: Render default cloudinit user-data
+  template:
+    src: generic-user-data.j2
+    dest: "{{ playbook_dir }}/data/files/cloud-init/user-data"
     mode: 0644
 
 # - name: Render machine specific init config
@@ -80,43 +113,19 @@
 #     mode: 0644
 #   loop: "{{ groups['metal'] }}"
 
-- name: Render machine specific cloudinit meta-data
-  template:
-    src: meta-data.j2
-    dest: "{{ role_path }}/files/data/init-config/meta_data/{{ hostvars[item]['mac'] }}_init"
-    mode: 0644
-  loop: "{{ groups['metal'] }}"
+# - name: Render machine specific cloudinit meta-data
+#   template:
+#     src: meta-data.j2
+#     dest: "{{ role_path }}/data/files/cloud-init/{{ hostvars[item]["mac"] }}/meta-data"
+#     mode: 0644
+#   loop: "{{ groups['metal'] }}"
 
-- name: Render machine specific cloudinit user-data
-  template:
-    src: user-data.j2
-    dest: "{{ role_path }}/files/data/init-config/user_data/{{ hostvars[item]['mac'] }}_init"
-    mode: 0644
-  loop: "{{ groups['metal'] }}"
-
-# - name: Check if docker is running
-#   shell: launchctl list | grep application.com.docker
-
-# - name: wait for docker service
-#   service:
-#     name: docker
-#     state: started
-#   register: docker_service
-#   until: docker_service.state == "running"
-#   retries: 3
-#   delay: 20
-
-# - name: wait for docker service
-#   community.general.launchd: # for macos
-#     # find name with `sudo launchctl list | grep docker`
-#     name: com.docker.vmnetd
-#     # src: /Library/LaunchDaemons/com.docker.vmnetd.plist
-#     state: started
-#   register: docker_service
-#   # until: docker_service.status.current_state == "started"
-#   # # until: docker_service.state == "running"
-#   # retries: 3
-#   # delay: 20
+# - name: Render machine specific cloudinit user-data
+#   template:
+#     src: user-data.j2
+#     dest: "{{ role_path }}/data/files/cloud-init/{{ hostvars[item]["mac"] }}/user-data"
+#     mode: 0644
+#   loop: "{{ groups['metal'] }}"
 
 - name: Start ephemeral PXE server
   docker_compose:

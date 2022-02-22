@@ -1,0 +1,102 @@
+#cloud-config
+autoinstall:
+  version: 1
+  refresh-installer:
+    update: true
+  apt:
+    geoip: true
+    preserve_sources_list: false
+    primary:
+    - arches: [amd64, i386]
+      uri: http://archive.ubuntu.com/ubuntu
+    - arches: [default]
+      uri: http://ports.ubuntu.com/ubuntu-ports
+  hostname: localhost
+  keyboard:
+    layout: us
+    toggle: null
+    variant: ''
+  locale: en_US.UTF-8
+  network:
+    version: 2
+    ethernets:
+      eno1:
+        dhcp4: true
+      enp0s31f6:
+        dhcp4: true
+  packages:
+    - apt-transport-https
+    - ca-certificates
+    - cloud-init
+    - curl
+    - debconf
+    - debconf-i18n
+    - gnupg
+    - net-tools
+    - openssh-server
+    - python
+    - python3-apt
+    - python3-pip
+  update: yes
+  user-data:
+    users:
+      # - default  ## do not use default 'ubuntu' user
+      - name: {{ user }}
+        groups: [adm, audio, cdrom, dialout, floppy, video, plugdev, dip, netdev, sudo, wheel]
+        lock-passwd: false
+        passwd: {{ crypted_pass }}
+        shell: /bin/bash
+        ssh-authorized-keys:
+          - {{ ssh_rsa }}
+          - {{ ssh_ed25519 }}
+        sudo:
+          - 'ALL=(ALL) NOPASSWD:ALL'
+  storage:
+    grub:
+      reorder_uefi: false
+    swap:
+      size: 0
+    config:
+    - id: root-disk-0
+      type: disk
+      path: /dev/nvme0n1
+      wipe: superblock-recursive
+      preserve: false
+      grub_device: false
+      name: ''
+      ptable: gpt
+    - id: root-partition-0
+      type: partition
+      device: root-disk-0
+      size: 512M
+      wipe: superblock
+      flag: boot
+      number: 1
+      preserve: false
+      grub_device: true
+    - id: root-format-0
+      type: format
+      fstype: fat32
+      volume: root-partition-0
+      preserve: false
+    - id: root-partition-1
+      type: partition
+      device: root-disk-0
+      size: -1
+      wipe: superblock
+      flag: ''
+      number: 2
+      preserve: false
+    - id: root-format-1
+      type: format
+      fstype: ext4
+      volume: root-partition-1
+      preserve: false
+    - id: root-mount-0
+      type: mount
+      device: root-format-0
+      path: /boot/efi
+    - id: root-mount-1
+      type: mount
+      device: root-format-1
+      path: /
