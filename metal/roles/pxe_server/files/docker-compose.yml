@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  # dhcp:
+  #   build: ./dhcp
+  #   volumes:
+  #     - ./data/pxe-config/dhcpd.conf:/etc/dhcp/dhcpd.conf
+  #   network_mode: host
+  tftp:
+    build: ./tftp
+    network_mode: host
+    volumes:
+      - ./data/init-config/meta-data:/var/lib/tftpboot/meta-data
+      - ./data/init-config/user-data:/var/lib/tftpboot/user-data
+      - ./data/pxe-config/grub.cfg:/var/lib/tftpboot/grub.cfg
+      - ./data/iso/:/var/lib/tftpboot/iso/
+      - ./data/os/EFI/BOOT/BOOTx64.EFI:/var/lib/tftpboot/BOOTx64.EFI
+      - ./data/os/EFI/BOOT/grubx64.efi:/var/lib/tftpboot/grubx64.efi
+      - ./data/os/casper/initrd:/var/lib/tftpboot/initrd
+      - ./data/os/casper/vmlinuz:/var/lib/tftpboot/vmlinuz
+      # - ./data/os/images/pxeboot/initrd.img:/var/lib/tftpboot/initrd.img
+      # - ./data/os/images/pxeboot/vmlinuz:/var/lib/tftpboot/vmlinuz
+
+  http:
+    build: ./http
+    network_mode: host
+    volumes:
+      - ./data/os:/usr/share/nginx/html/os
+      - ./data/init-config/:/usr/share/nginx/html/init-config
+    environment:
+      NGINX_PORT: 80

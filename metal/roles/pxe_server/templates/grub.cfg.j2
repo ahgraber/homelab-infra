@@ -1,0 +1,22 @@
+default=autoinstall
+timeout=5
+timeout_style=menu
+
+menuentry '{{ iso_url | basename | splitext | first }} (autoinstall)' --id=autoinstall {
+    echo "Loading Kernel..."
+    linux vmlinuz \
+        ip=dhcp \
+        url=http://{{ ansible_default_ipv4.address }}/iso/{{ iso_url | basename | splitext | first }}.iso autoinstall \
+        ds=nocloud-net\;seedfrom=http://{{ ansible_default_ipv4.address }}/ root=/dev/ram0 cloud-config-url=/dev/null
+    echo "Loading Ram Disk..."
+    initrd initrd
+}
+menuentry '{{ iso_url | basename | splitext | first }} (PXE)' --id=pxe {
+    echo "Loading Kernel..."
+    linux vmlinuz \
+        ip=dhcp \
+        url=http://{{ ansible_default_ipv4.address }}/iso/{{ iso_url | basename | splitext | first }}.iso \
+        root=/dev/ram0 cloud-config-url=/dev/null
+    echo "Loading Ram Disk..."
+    initrd initrd
+}

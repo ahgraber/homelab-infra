@@ -1,0 +1,26 @@
+- hosts: localhost
+  become: true
+  gather_facts: true
+
+  tasks:
+    # - name: collect facts about system services
+    #   service_facts:
+
+    # - name: Debug
+    #   debug:
+    #     var: ansible_facts.services
+
+    - name: wait for docker service
+      community.general.launchd:
+        # find name with `sudo launchctl list | grep docker`
+        name: com.docker.vmnetd
+        # src: /Library/LaunchDaemons/com.docker.vmnetd.plist
+        state: started
+      register: docker_service
+      until: docker_service.status.current_state == "started"
+      # until: docker_service.state == "running"
+      retries: 3
+      delay: 20
+
+    - debug:
+        var: docker_service

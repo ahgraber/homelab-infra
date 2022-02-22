@@ -1,0 +1,126 @@
+- name: Set facts from .envrc
+  set_fact:
+    "{{item}}": "{{ lookup('env', '{{ item }}') }}"
+  with_items:
+    - ssh_rsa
+    - ssh_ed25519
+    - domain
+    - gateway
+    - user
+    - passwd
+    - crypted_pass
+    - email
+  # vars:
+  #   envrc: {}
+
+# - debug:
+#     var: '{{item}}'
+#   with_items:
+#     # - 'a'
+#     # - 'b'
+#     # - 'c'
+#     - ssh_rsa
+#     - ssh_ed25519
+#     - domain
+#     - gateway
+#     - user
+#     - passwd
+#     - crypted_pass
+#     - email
+
+# - debug: msg="item.item={{item.item}}, item.stdout={{item.stdout}}"
+#   with_items: "{{envrc.results}}"
+
+- name: Download ISO
+  get_url:
+    url: "{{ iso_url }}"
+    dest: "{{ role_path }}/files/data/iso/{{ iso_url | basename }}"
+    checksum: "{{ iso_checksum }}"
+  register: iso
+
+- name: Extract the ISO
+  become: yes
+  command:
+    cmd: "xorriso -osirrox on -indev {{ iso.dest }} -extract / {{ role_path }}/files/data/os"
+    creates: "{{ role_path }}/files/data/os/.treeinfo"
+
+# chmod -R +w iso {{ role_path }}/files/data/os
+
+# # Create empty meta-data file:
+# touch iso/nocloud/meta-data
+
+# # Copy user-data file:
+# cp user-data iso/nocloud/user-data
+
+- debug:
+    var: "{{item}}"
+  with_items:
+    - ansible_default_ipv4.address
+    - ansible_default_ipv4.broadcast
+    - ansible_default_ipv4.gateway
+    - ansible_default_ipv4.netmask
+    - ansible_default_ipv4.network
+
+- name: Render DHCP config
+  template:
+    src: dhcpd.conf.j2
+    dest: "{{ role_path }}/files/data/pxe-config/dhcpd.conf"
+    mode: 0644
+
+- name: Render GRUB config
+  template:
+    src: grub.cfg.j2
+    dest: "{{ role_path }}/files/data/pxe-config/grub.cfg"
+    mode: 0644
+
+# - name: Render machine specific init config
+#   template:
+#     src: kickstart.ks.j2
+#     dest: "{{ role_path }}/files/data/init-config/{{ hostvars[item]['mac'] }}.ks"
+#     mode: 0644
+#   loop: "{{ groups['metal'] }}"
+
+- name: Render machine specific cloudinit meta-data
+  template:
+    src: meta-data.j2
+    dest: "{{ role_path }}/files/data/init-config/meta_data/{{ hostvars[item]['mac'] }}_init"
+    mode: 0644
+  loop: "{{ groups['metal'] }}"
+
+- name: Render machine specific cloudinit user-data
+  template:
+    src: user-data.j2
+    dest: "{{ role_path }}/files/data/init-config/user_data/{{ hostvars[item]['mac'] }}_init"
+    mode: 0644
+  loop: "{{ groups['metal'] }}"
+
+# - name: Check if docker is running
+#   shell: launchctl list | grep application.com.docker
+
+# - name: wait for docker service
+#   service:
+#     name: docker
+#     state: started
+#   register: docker_service
+#   until: docker_service.state == "running"
+#   retries: 3
+#   delay: 20
+
+# - name: wait for docker service
+#   community.general.launchd: # for macos
+#     # find name with `sudo launchctl list | grep docker`
+#     name: com.docker.vmnetd
+#     # src: /Library/LaunchDaemons/com.docker.vmnetd.plist
+#     state: started
+#   register: docker_service
+#   # until: docker_service.status.current_state == "started"
+#   # # until: docker_service.state == "running"
+#   # retries: 3
+#   # delay: 20
+
+- name: Start ephemeral PXE server
+  docker_compose:
+    project_src: "{{ role_path }}/files"
+    state: present
+    restarted: true
+    build: true
