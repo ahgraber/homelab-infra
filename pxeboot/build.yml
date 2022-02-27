@@ -1,0 +1,19 @@
+- name: Render PXE resources
+  hosts: localhost
+  roles:
+    - role: pxe
+      tags: render
+
+# - name: Set up OPNsense as PXE server
+#   hosts: opnsense
+#   # become: true
+#   roles:
+#     - role: opnsense
+#       tags: push
+
+- name: Set up TrueNAS as PXE server
+  hosts: truenas
+  # become: true
+  roles:
+    - role: truenas
+      tags: push

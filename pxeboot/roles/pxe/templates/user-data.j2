@@ -25,7 +25,7 @@ autoinstall:
   network:
     version: 2
     ethernets:
-      eno1:
+      {{ hostvars[item]['network_interface'] }}:
         addresses:
         - {{ hostvars[item]['ansible_host'] }}/16
         critical: true

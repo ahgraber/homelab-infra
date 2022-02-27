@@ -1,0 +1,11 @@
+- name: Ensure tftp folder exists
+  become: true
+  file:
+    path: "{{pxe_path}}"
+    state: directory
+    mode: "0777"
+
+- name: copy files to server (this may take a minute)
+  copy:
+    src: "{{ playbook_dir }}/data/files/"
+    dest: "{{pxe_path}}"

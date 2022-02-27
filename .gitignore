@@ -16,3 +16,6 @@ archive/
 # main.tf  # allowing because all secrets are in .envrc
 govcvars.sh
 hosts.ini
+
+# os stuff
+.DS_Store

@@ -142,9 +142,11 @@ resource "local_file" "ansible_hosts" {
       worker_ips              = module.workers.ip,
       node_user               = var.NODE_USER,
       kube_vip                = var.KUBE_VIP
+      kube_vip_iface          = var.KUBE_VIP_IFACE
       cluster_domain          = var.DOMAIN
       kubernetes_oidc_issuer  = var.KUBERNETES_OIDC_ISSUER
-      kubernetes_oidc_clientid= var.KUBERNETES_OIDC_CLUSTERID
+      kubernetes_oidc_clientid        = var.KUBERNETES_OIDC_CLUSTERID
+      kubernetes_oidc_username_claim  = var.KUBERNETES_OIDC_USERNAME_CLAIM
     }
   )
   filename = "./ansible/inventory/cluster/host.ini"

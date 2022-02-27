@@ -1,0 +1,115 @@
+- name: Set facts from .envrc
+  set_fact:
+    "{{item}}": "{{ lookup('env', '{{ item }}') }}"
+  with_items:
+    - ssh_rsa
+    - ssh_ed25519
+    - domain
+    - gateway
+    - user
+    - passwd
+    - crypted_pass
+    - email
+  # vars:
+  #   envrc: {}
+
+# - debug:
+#     var: '{{item}}'
+#   with_items:
+#     # - 'a'
+#     # - 'b'
+#     # - 'c'
+#     - ssh_rsa
+#     - ssh_ed25519
+#     - domain
+#     - gateway
+#     - user
+#     - passwd
+#     - crypted_pass
+#     - email
+
+# - debug: msg="item.item={{item.item}}, item.stdout={{item.stdout}}"
+#   with_items: "{{envrc.results}}"
+
+- name: Ensure folder structure exists
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - "{{ playbook_dir }}/data/"
+    - "{{ playbook_dir }}/data/files/"
+    - "{{ playbook_dir }}/data/files/cloud-init/"
+    - "{{ playbook_dir }}/data/files/grub/"
+    - "{{ playbook_dir }}/data/iso/"
+    - "{{ playbook_dir }}/data/os/"
+
+- name: Download ISO
+  get_url:
+    url: "{{ iso_url }}"
+    # dest: "{{ playbook_dir }}/data/files/iso/{{ iso_url | basename }}"
+    dest: "{{ playbook_dir }}/data/iso/{{ iso_url | basename }}"
+    checksum: "{{ iso_checksum }}"
+  register: iso
+
+- name: Extract the ISO
+  become: yes
+  command:
+    cmd: "xorriso -osirrox on -indev {{ iso.dest }} -extract / {{ playbook_dir }}/data/os"
+    creates: "{{ playbook_dir }}/data/os/.treeinfo"
+
+- name: Copy required files from extract
+  delegate_to: localhost
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  loop:
+    - {
+        src: "{{ playbook_dir }}/data/os/casper/initrd",
+        dest: "{{ playbook_dir }}/data/files/initrd",
+      }
+    - {
+        src: "{{ playbook_dir }}/data/os/casper/vmlinuz",
+        dest: "{{ playbook_dir }}/data/files/vmlinuz",
+      }
+
+# ref: https://askubuntu.com/questions/1235723/automated-20-04-server-installation-using-pxe-and-live-server-image
+- name: Download signed grub netboot EFI
+  get_url:
+    url: "http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/uefi/grub2-amd64/current/grubnetx64.efi.signed"
+    dest: "{{ item }}"
+    checksum: "sha256:442a13ce54100d4f51b1ec68d495a6eacf9fd06b862ed3ed51ec5ae159f18f84"
+  # register: efi
+  loop:
+    - "{{ playbook_dir }}/data/files/grubnetx64.efi.signed"
+    # - "{{ playbook_dir }}/data/files/pxelinux.0"
+
+- name: Render GRUB config
+  template:
+    src: grub.cfg.j2
+    dest: "{{ playbook_dir }}/data/files/grub/grub.cfg"
+    mode: 0644
+
+- name: Render default cloudinit meta-data
+  template:
+    src: meta-data.j2
+    dest: "{{ playbook_dir }}/data/files/cloud-init/meta-data"
+    mode: 0644
+
+- name: Render default cloudinit user-data
+  template:
+    src: generic-user-data.j2
+    dest: "{{ playbook_dir }}/data/files/cloud-init/user-data"
+    mode: 0644
+# - name: Render machine-specific cloudinit meta-data
+#   template:
+#     src: meta-data.j2
+#     dest: "{{ role_path }}/data/files/cloud-init/{{ hostvars[item]["mac"] }}/meta-data"
+#     mode: 0644
+#   loop: "{{ groups["metal"] }}"
+
+# - name: Render machine-specific cloudinit user-data
+#   template:
+#     src: user-data.j2
+#     dest: "{{ role_path }}/data/files/cloud-init/{{ hostvars[item]["mac"] }}/user-data"
+#     mode: 0644
+#   loop: "{{ groups["metal"] }}"

@@ -14,9 +14,10 @@ k3s_server:
     # # if different from kubevip_address
     # - "{{ k3s_registration_address }}"
   docker: false
-  flannel-backend: "vxlan" # "none" # This needs to be in quotes
+  flannel-backend: "none" # "vxlan" # This needs to be in quotes
   disable:
     # - local-storage
+    - flannel # replaced with Calico
     - metrics-server # managed with flux
     - servicelb # use metallb
     - traefik # managed with flux
@@ -42,12 +43,15 @@ k3s_server:
   etcd-expose-metrics: true
   kube-apiserver-arg:
     - "anonymous-auth=false"
-    # - "oidc-issuer-url={{ kubernetes_oidc_issuer }}"
-    # - "oidc-client-id={{ kubernetes_oidc_clientid }}"
-
-    # - "oidc-username-claim=email"
-    # - "oidc-groups-claim=groups"
-  # node-label:
-  #   - "node-role.kubernetes.io/master=true"
+    - "oidc-issuer-url={{ kubernetes_oidc_issuer }}"
+    - "oidc-client-id={{ kubernetes_oidc_clientid }}"
+    - "oidc-username-claim=email" # sub
+    - "oidc-groups-claim=groups"
+    - "oidc-groups-prefix=oidc:"
+    # - "oidc-ca-file=/etc/kubernetes/ssl/kc-ca.pem"
+    #                 /etc/kubernetes/ca-bundle.crt
+    #                 /var/lib/rancher/k3s/server/tls/server-ca.crt
+    #                 /var/lib/rancher/k3s/server/tls/client-ca.crt  # node-label:
+    #   - "node-role.kubernetes.io/master=true"
   node-taint:
     - "node-role.kubernetes.io/master=true:NoSchedule"
