@@ -1,15 +1,4 @@
 ---
-- name: Disable APT recommends
-  ansible.builtin.blockinfile:
-    path: /etc/apt/apt.conf.d/02norecommends
-    mode: 0644
-    create: true
-    block: |
-      APT::Install-Recommends "false";
-      APT::Install-Suggests "false";
-      APT::Get::Install-Recommends "false";
-      APT::Get::Install-Suggests "false";
-
 - name: Upgrade all system packages
   ansible.builtin.apt:
     upgrade: full
@@ -36,6 +25,25 @@
     - apt_install_packages is defined
     - apt_install_packages is iterable
     - apt_install_packages | length > 0
+
+- name: Check if Raspberry Pi
+  command: grep -q  "Raspberry Pi" /proc/cpuinfo
+  ignore_errors: true
+  register: is_raspberry
+
+- name: Install raspberry specific packages for Ubuntu 21 or greater
+  ansible.builtin.apt:
+    name:
+      - linux-modules-extra-raspi
+    install_recommends: false
+    update_cache: true
+    cache_valid_time: 3600
+    autoclean: true
+    autoremove: true
+  register: apt_install_raspberry
+  retries: 5
+  until: apt_install_raspberry is success
+  when: is_raspberry and (ansible_lsb.major_release|int >= 21)
 
 - name: Gather installed packages
   ansible.builtin.package_facts:

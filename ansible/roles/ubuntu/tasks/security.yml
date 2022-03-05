@@ -17,7 +17,9 @@
 - name: Disable apparmor
   ansible.builtin.replace:
     path: /etc/default/grub
-    regexp: '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ option | regex_escape }}=).)*)(?:[" ]{{ option | regex_escape }}=\S+)?(.*")$'
+    regexp:
+      '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ option | regex_escape }}=).)*)(?:[" ]{{ option |
+      regex_escape }}=\S+)?(.*")$'
     replace: '\1 {{ option }}={{ value }}\2'
   vars:
     option: apparmor
@@ -29,7 +31,9 @@
 - name: Disable mitigations
   ansible.builtin.replace:
     path: /etc/default/grub
-    regexp: '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ option | regex_escape }}=).)*)(?:[" ]{{ option | regex_escape }}=\S+)?(.*")$'
+    regexp:
+      '^(GRUB_CMDLINE_LINUX=(?:(?![" ]{{ option | regex_escape }}=).)*)(?:[" ]{{ option |
+      regex_escape }}=\S+)?(.*")$'
     replace: '\1 {{ option }}={{ value }}\2'
   vars:
     option: mitigations

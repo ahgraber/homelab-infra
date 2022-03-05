@@ -21,6 +21,9 @@ k3s_debug: false
 # Enabled embedded etcd
 k3s_etcd_datastore: true
 
+# (bool) Allow the use of unsupported configurations in k3s
+k3s_use_unsupported_config: false
+
 # Control Plane registration address
 # If you want to use kube-vip only set this to "{{ kubevip_address }}"
 k3s_registration_address: "{{ kubevip_address }}"
@@ -33,9 +36,8 @@ k3s_server_manifests_urls:
     filename: kube-vip-rbac.yaml
 
 # (list) A flat list of templates to deploy on the primary control plane
-# # manifests placed in /var/lib/rancher/k3s/server/manifests
+# /var/lib/rancher/k3s/server/manifests
 k3s_server_manifests_templates:
-  # - "kube-vip/kube-vip-rbac.yaml.j2"
-  # - "kube-vip/kube-vip-arp-daemonset.yaml.j2"
+  - "calico-installation.yaml.j2"
   - "kube-vip-daemonset.yaml.j2"
-  - "kube-vip-cloud-controller-configmap.yaml.j2"
+  # - "kube-vip-cloud-controller-configmap.yaml.j2" # to replace metallb

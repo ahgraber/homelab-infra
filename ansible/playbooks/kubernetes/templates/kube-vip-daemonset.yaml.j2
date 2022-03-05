@@ -18,19 +18,9 @@ spec:
         app.kubernetes.io/instance: kube-vip
         app.kubernetes.io/name: kube-vip
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/master
-                operator: Exists
-            - matchExpressions:
-              - key: node-role.kubernetes.io/control-plane
-                operator: Exists
       containers:
         - name: kube-vip
-          image: ghcr.io/kube-vip/kube-vip:v0.4.1
+          image: ghcr.io/kube-vip/kube-vip:v0.4.2
           imagePullPolicy: IfNotPresent
           args:
             - manager
@@ -48,7 +38,11 @@ spec:
             - name: cp_namespace
               value: kube-system
             - name: lb_enable
-              value: "false"
+              value: "true"
+            # - name: vip_leaderelection
+            #   value: "true"
+            # - name: vip_loglevel
+            #   value: "5"
             - name: svc_enable
               value: "false"
             - name: vip_ddns
@@ -66,6 +60,16 @@ spec:
           ip: 127.0.0.1
       hostNetwork: true
       serviceAccountName: kube-vip
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: Exists
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
       tolerations:
         - effect: NoSchedule
           operator: Exists

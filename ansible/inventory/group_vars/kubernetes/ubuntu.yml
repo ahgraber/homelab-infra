@@ -1,7 +1,6 @@
 ---
 # Timezone for the servers
 timezone: "America/New_York"
-
 # # Additional ssh public keys to add to the nodes
 # ssh_authorized_keys:
 #   - "ssh-rsa ABCD user@example.com"
