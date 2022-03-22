@@ -92,6 +92,15 @@ We will use TrueNAS with NFS.
 - [add cloud-init to iso](https://github.com/covertsh/ubuntu-autoinstall-generator/blob/main/ubuntu-autoinstall-generator.sh)
 - [add cloud-init to iso 2](https://forums.fogproject.org/topic/15991/ubuntu-20-04-nfs-pxe-autoinstall-automation)
 
+### OPNSense Ansible
+
+- [naturalis.ansible-opnsense](https://github.com/naturalis/ansible-opnsense)
+- [demo with variables](https://github.com/naturalis/oss-network-demo/blob/master/ansible/basic)
+
 ## TODO
 
 - ensure inventory is set as static ips in DHCP
+- manual BIOS for pxe on RockPi X
+  - [pxe boot uefi](https://forum.radxa.com/t/cant-seem-to-pxe-boot-uefi-network-stack-not-working/4571/23)
+  - [pxe boot isuse](https://forum.radxa.com/t/pxe-boot-issue-please-help/5519)
+  - [instructions](https://gist.github.com/AdrianKoshka/5b6f8b6803092d8b108cda2f8034539a)

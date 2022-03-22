@@ -1,4 +1,18 @@
 ---
+- name: Add crowdsec key
+  shell: curl -L https://packagecloud.io/crowdsec/crowdsec/gpgkey | sudo apt-key add -
+
+- name: Add crowdsec source
+  copy:
+    content: |
+      deb https://packagecloud.io/crowdsec/crowdsec/ubuntu/ focal main
+      deb-src https://packagecloud.io/crowdsec/crowdsec/ubuntu/ focal main
+    dest: /etc/apt/sources.list.d/crowdsec_crowdsec.list
+
+- name: Apt update
+  shell: apt update
+  become: true
+
 - name: Upgrade all system packages
   ansible.builtin.apt:
     upgrade: full
@@ -25,6 +39,18 @@
     - apt_install_packages is defined
     - apt_install_packages is iterable
     - apt_install_packages | length > 0
+
+- name: Install crowdsec packages
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    install_recommends: false
+    update_cache: true
+    cache_valid_time: 3600
+    autoclean: true
+    autoremove: true
+  loop:
+    - crowdsec
+    - crowdsec-firewall-bouncer-iptables
 
 - name: Check if Raspberry Pi
   command: grep -q  "Raspberry Pi" /proc/cpuinfo
