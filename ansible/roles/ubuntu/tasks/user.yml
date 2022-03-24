@@ -1,7 +1,9 @@
 ---
 - name: Add user to sudoers
   ansible.builtin.copy:
-    content: "{{ ansible_user }} ALL=(ALL:ALL) NOPASSWD:ALL"
+    content: |
+      "{{ ansible_user }} ALL=(ALL:ALL) NOPASSWD:ALL"
+
     dest: "/etc/sudoers.d/{{ ansible_user }}_nopasswd"
     mode: "0440"
 

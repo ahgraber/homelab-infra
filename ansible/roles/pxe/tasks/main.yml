@@ -1,3 +1,4 @@
+---
 - name: Set facts from .envrc
   set_fact:
     "{{item}}": "{{ lookup('env', '{{ item }}') }}"
@@ -52,7 +53,7 @@
   register: iso
 
 - name: Extract the ISO
-  become: yes
+  become: true
   command:
     cmd: "xorriso -osirrox on -indev {{ iso.dest }} -extract / {{ playbook_dir }}/data/os"
     creates: "{{ playbook_dir }}/data/os/.treeinfo"
@@ -63,14 +64,8 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
   loop:
-    - {
-        src: "{{ playbook_dir }}/data/os/casper/initrd",
-        dest: "{{ playbook_dir }}/data/files/initrd",
-      }
-    - {
-        src: "{{ playbook_dir }}/data/os/casper/vmlinuz",
-        dest: "{{ playbook_dir }}/data/files/vmlinuz",
-      }
+    - { src: "{{ playbook_dir }}/data/os/casper/initrd", dest: "{{ playbook_dir }}/data/files/initrd" }
+    - { src: "{{ playbook_dir }}/data/os/casper/vmlinuz", dest: "{{ playbook_dir }}/data/files/vmlinuz" }
 
 # ref: https://askubuntu.com/questions/1235723/automated-20-04-server-installation-using-pxe-and-live-server-image
 - name: Download signed grub netboot EFI

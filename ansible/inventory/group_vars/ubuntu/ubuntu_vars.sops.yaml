@@ -1,0 +1,61 @@
+ansible_user: ENC[AES256_GCM,data:o3cj,iv:baP0ilSin9BuxhpJFo+GLp+yWambRJDyWTVFldgJOuE=,tag:J1dl3fpB/0LgSFeCm6UifA==,type:str]
+ssh_authorized_keys:
+  - ENC[AES256_GCM,data:XCqX6FBiOOQ42f+8wjiKrEnl/Chm1hNBuHz5NDuQK/Exhmnd3RE4lUqkDissZB1Ev9Gt9xvAToOXeVnmqf8QVj92+ObH/yls9XQfpOPKF9WkyOUyIkafwwAdrfA3rm5soSAdS/ajoS1NCFph0ayR/frSZn4yQEC0qD8qG9TwATsb8Ehuiow5zFP9vbDelICtj/4pUQGn1aKSzpVaQxqOVjuxSWky59E8MyCens8MYodiSwBTbUVopGpwomTuiUE3PaOZP4Dg21FhkIQKn3EALaR57/lAVyEnqKUvfak/QpdxJk1RnLCW0OFd1UouIr4yP6mNQoTY5ouMojpcmxjCHqnlf5qx27n1YUwPTxwOCV23OT1SiFBZYLA+q4J8iOKG9mBczY9ik0uY772rM80hFo0t5Te4ortZ5jDiCAXydjhd8/3bRHrQD8tlZq1PPMpOpcATMOxbaqMMtRSwyPQv+soiKAOBwdjXbKAJBLoZ9Oh+26nV51z+SJ2qHaaYqkoG0taTAUcdpDr30WTMDS0K16EZdqmS4wFvD83sp1JO5Z6jTiJON7DKyU+qPOBt36pGgSnvHKkYd5VN5Ov3g/DTyfXl5LI0FUb2ZGAsDPdK5jgpX1BGeJqagmRr03C0dyAQ43hZq+Rfa+iI2gXUBGcnTRlsgjrwbwIOdii5CCacnj8rdpYlwKAVIyB7iZ5BqDzfnlUGafFIA/cPfOgfIwH4FDhpcP6ZeUWG1oya0R1Yc93GPp3jq2QyBoWU+uyRLXn2TiX1OPsyeFR9+IOjA5qYvKe6ofr/zocHs9srBAfTeO/uTHY3ILpk4yZtOXXNFqhkVRYmo3Z5btdI1Aendih13xIezcHBl2xv2B1a4XdVRFLym/DiNEl/aHCwFEjaZpRcBdy/C28M6lo4TPeTroZiWjjMMUrkOAXKPMaY3ZGkzeSaAWID98m2cDkcxOE9SEeix0jGvWSI0xJOgkuM2n4HYCjS/uBv8cDsJ+OvhFY3bg==,iv:49XK1WEg6+lznKljqiFG3Vedja4ckl96oNO1+rKEMGQ=,tag:CcvRRHH519q9ubgNPXhPWw==,type:str]
+  - ENC[AES256_GCM,data:YkwLeG+9daFQRR2EQmUZEPCtlS5fcsn0pbCWhq8ZjmrDLvSTiMzj1kqi0OB1/GFdQvpgOpzPevcU3TsxjY2L0o0vglEMckyi+tdYMSTgGh7DbeohhzazFHHtyVNjXRqX8iLuhgFm6avuO78=,iv:YVIJtWY+8wspaR12QLebSC68DQbcGbq/4+Mwbt5KkYw=,tag:P+yoyIHjbiglaJPUzldxDQ==,type:str]
+email: ENC[AES256_GCM,data:QkyVhMfP1yQnObGAOBGsvrc6A6AQ9DbzRgY=,iv:sfjZ+RrQ9Fg9/SHQhIyXCuo6xOnCWttnLfvNrGI1sWU=,tag:3Fc+XHOcIjmvOiQw40i1Yg==,type:str]
+passwd: ENC[AES256_GCM,data:hY9bn9V/7bUwWGn1,iv:Q6Mc/Qu4QFZk88I83db85cRu41IqpU2AXK9m8ygFUuI=,tag:DI/xo0ao+auVIOwISa+jGw==,type:str]
+crypted_pass: ENC[AES256_GCM,data:mM+tWIx/shMWeneqwG/rWkg2iQL1iQGYZR3Zlqcoqrrn/ecyHCRPeH8P/FmXvjqsswnqjPUvuKG5ECNdiQgxF+xWdjIOV2HiSv4zrKwPP8v2ZgYNIJxanUq/yTDj/vuQCGpwPrU7GSxRqg==,iv:dJM7/8Dc1DH/5Psd4Y7QT3BJEIa+tsQWedZpqI76AmY=,tag:vrPfvETozO0nuA/Izi4F4w==,type:str]
+domain: ENC[AES256_GCM,data:LQomp4Er7/gmGRb2pvuJDH4=,iv:1/ajFweVg+p8Ggs9U7fDfCZi6/pWNXdpBGwh5AZVl3o=,tag:grEV8tQRbaA/MiYfecZ5kg==,type:str]
+sops:
+  kms: []
+  gcp_kms: []
+  azure_kv: []
+  hc_vault: []
+  age: []
+  lastmodified: "2022-03-24T01:03:19Z"
+  mac: ENC[AES256_GCM,data:ypktutbmEqlpVYgjiNx9VLbS6KjBHj8bRI9NOyDu3GSDBqEJJq3BmFLqK6+oy1AOsphOVa4j40kNCQya2qjEC/1QW6bs5Fpz5GiDIBTBBYv4tcwBvVgzqRmemC2nhVDJpazFMDygoTcKapcCeET0+dtRUxPZdcphR5MpWr03fBc=,iv:pAcS5xrtTnP2K6tYrpW/3PrpDy5OMRGTkbcOwIJOtvo=,tag:zOicAhcsdmtBigldNCuj5A==,type:str]
+  pgp:
+    - created_at: "2022-03-24T01:03:18Z"
+      enc: |
+        -----BEGIN PGP MESSAGE-----
+
+        hQIMA5zJY8YOhWjXAQ//TlB3ZvUUr6WrJbZlKVQqpfZlmAmaCGXIZ8eZKYZhcnrU
+        l6HYJWD09lTgnhTZmLil3LEEFY4ef6ZQ+JViXq428x9bwrx3gsquAL95byVXQhdl
+        e0fSzyVGdCylU3xmMR2xs/7MXeS/yVHcp05jjAe4XzfA2DGIu+gVIiRYgEYuJpTN
+        B9t755M4Cf7Q8w96SJtBwezDIClbKDycw7KqKy4x9Fh8OR9lD/Il99W/LJ4LwSXn
+        LG4Lc0yWIjIW6I1CE452Aif7QKcB0CR/5Fi8i4fk4v7aaI1lMSTaDCJOD1pRwYRB
+        IleFuJejVhqBIPz9ZxmDdwIe0SPRbx2s1xYtRXUQIY/euTZQdElG5zL6UlkOPucj
+        cs3i6zkPi7mIf7xOKxdnZpBSs1CR2ITCo0f9Kw1DMJYoqpkIn3MB8zbexrSg9YcC
+        c6KW/0T/vM6myZPkUPBLzvS20hB1bl1rbDqixDaheI4UHUNJRVZ/2PMGNDHrwZuf
+        eDE3r+WqTzPHT015MvBe4XLUe5VGQzu6OhVy9QIOkRSsx+ETyzotmu69Ib4f1C2B
+        msQXhr9fxXni6ma9ine86UapzjggNqaB1eAFUHAKHg+myZyxbLaWyZ9pi4cTqPVl
+        kbzHAqmUxUWfYH9A52P0aFg0Ru6EZsEeNyZR7oG698GK4+4ntr4aSaagVDWA3wDU
+        aAEJAhBKR6NdLNxQALjhU0HEbHXcPpa1qpDtvTGxOdY3ojJZLH7pfUR6t0z63tGY
+        rDhWwhibhvcCVJz6uq9CSr/Ppk0dNtJdCC6B+D+lG1xQCPZPkpPGgdQ9sKqIl7fE
+        BRrEaMLwBeYs
+        =5ye0
+        -----END PGP MESSAGE-----
+      fp: 74476FD56282FE17B8ED3B9FBA91288143674C56
+    - created_at: "2022-03-24T01:03:18Z"
+      enc: |
+        -----BEGIN PGP MESSAGE-----
+
+        hQIMAyOXK4v3ZOaiARAAnyYeRlvk2C+DWDu9qZnk6nbAxxSrHUkm93os37kKfG8X
+        HgiZAc/70yjW2VRo2+Y56B2ph/Im8Xpq6AtQFiB+uWmMw/KFXHFvVUgMJyPu+kFx
+        XIP1ozGr1tOY9sX1YdiExz/xtN5uliw2a/p5PtAOvvXlSZQZ1Ux8ngBLXsHND8gt
+        9SbGd9fDyKoHHVxfRZhKFLZru1eHr0WDDt96mdh+6kSf8FnyE/SrSPoRC0WWh6w1
+        WsV4lRjQsYQVDraYoEoaviVAlnDWlI1D6ij+In/3wxhDJ7AnLd8lrZMrCeNbFzJO
+        l0Zn2gpbCb5pP8MMFY55LYri33s0RGMZsTVmFswjqdXw7LyOMif12UqYAaTjg+Sz
+        AlD7xgLZAdjLMUOekoyV/1M6Kwt1gMyUNKyFGBmEgfF6qQEL5l+zte4S3BoaEAA1
+        q81o85rBCVbKVkgUUdNKDqY8+2i0eDj+0jcWXd2Fk7apiqSOWoEZifLkEej34DVi
+        nDtf3QB3uPHP5NDzcvObj/v5gNt6nGTeSTIGcoIfw6i2kwnvGZSPJJU8rp9ArhKW
+        qumvtkQhW1Q3ObTJbLaGLvuk3jqPiQo0yW7hxQwI9UhNRXzC+ctTd2v3gYlhfr+x
+        BuVGsPnTkcOlIPMfT6Ku5q4v+tanEms8p3yuovRnwo4E9SMAlvKLGmby+x50Jc/U
+        aAEJAhD9bl/pubis1AznbxzU0xC6KdpC/mFvjEU1CHZm9u9ru7Dc5keR3qst0r2X
+        M5P713Lmxb1UyxnIMvyOJfSbA1VdCVoAJKMZtA4384GhMilgnwCOhnvjCFOid8tB
+        Dj4xbinf9Vyf
+        =JAlw
+        -----END PGP MESSAGE-----
+      fp: 9E7519C0C77183E62B8818145C69FF3EF2E26E3F
+  unencrypted_suffix: _unencrypted
+  version: 3.7.1

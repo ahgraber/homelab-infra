@@ -1,0 +1,19 @@
+---
+all:
+  children:
+    kubernetes:
+      children:
+        controller:
+          children:
+            metal-ctrl:
+            tf-ctrl:
+        worker:
+          children:
+            metal-work:
+            tf-work:
+    ubuntu:
+      children:
+        metal:
+        terraform:
+    nas:
+    router:

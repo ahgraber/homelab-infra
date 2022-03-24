@@ -1,0 +1,10 @@
+---
+ansible_user: ${user}
+ssh_authorized_keys:
+  - ${ssh_rsa}
+  - ${ssh_ed25519}
+
+domain: ${domain}
+kubevip_address: ${kubevip_address}
+kubernetes_oidc_issuer: ${kubernetes_oidc_issuer}
+kubernetes_oidc_clientid: ${kubernetes_oidc_clientid}

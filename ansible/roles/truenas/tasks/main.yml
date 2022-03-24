@@ -1,4 +1,5 @@
-- name: Ensure tftp folder exists
+---
+- name: Ensure hosting folder exists
   become: true
   file:
     path: "{{pxe_path}}"

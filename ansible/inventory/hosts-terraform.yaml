@@ -1,0 +1,24 @@
+---
+terraform:
+  children:
+    tf-ctrl:
+      hosts:
+        k-ctrl-01:
+          ansible_host: 10.2.113.10
+        k-ctrl-02:
+          ansible_host: 10.2.113.11
+        # k-ctrl-03:
+        #     ansible_host: 10.2.113.12
+    tf-work:
+      hosts:
+        k-ctrl-03:
+          ansible_host: 10.2.113.12
+        k-work-01:
+          ansible_host: 10.2.113.30
+        k-work-02:
+          ansible_host: 10.2.113.31
+        k-work-03:
+          ansible_host: 10.2.113.32
+
+  vars:
+    network_interface: ens192
