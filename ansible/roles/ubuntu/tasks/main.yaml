@@ -1,0 +1,32 @@
+---
+- import_tasks: locale.yaml
+  tags:
+    - locale
+
+- import_tasks: packages.yaml
+  tags:
+    - packages
+
+- import_tasks: kernel.yaml
+  tags:
+    - kernel
+
+- import_tasks: network.yaml
+  tags:
+    - network
+
+- import_tasks: filesystem.yaml
+  tags:
+    - filesystem
+
+# - import_tasks: security.yaml
+#   tags:
+#     - security
+
+- import_tasks: unattended-upgrades.yaml
+  tags:
+    - unattended-upgrades
+
+- import_tasks: user.yaml
+  tags:
+    - user

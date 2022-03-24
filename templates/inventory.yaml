@@ -1,0 +1,25 @@
+---
+terraform:
+  children:
+    tf-ctrl:
+      hosts: |
+        %{ for index, hostname in controller_hostnames ~}
+        ${ hostname | to_nice_yaml(indent=8) }
+          ansible_host: ${ controller_ips[index] | to_nice_yaml(indent=10) }
+        %{ endfor ~}
+
+    tf-work:
+      hosts: |
+        %{ for index, hostname in worker_hostnames ~}
+        ${ hostname | to_nice_yaml(indent=8) }
+            ansible_host: ${ worker_ips[index] | to_nice_yaml(indent=10) }
+        %{ endfor ~}
+
+  vars:
+    ansible_user: ${ node_user | to_nice_yaml(indent=4) }
+    kubevip_address: ${ kube_vip | to_nice_yaml(indent=4) }
+    kubevip_interface: ${ kube_vip_iface | to_nice_yaml(indent=4) }
+    cluster_domain: ${ cluster_domain | to_nice_yaml(indent=4) }
+    kubernetes_oidc_issuer: ${ kubernetes_oidc_issuer | to_nice_yaml(indent=4) }
+    kubernetes_oidc_clientid: ${ kubernetes_oidc_clientid | to_nice_yaml(indent=4) }
+    kubernetes_oidc_username_claim: ${ kubernetes_oidc_username_claim | to_nice_yaml(indent=4) }

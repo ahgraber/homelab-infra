@@ -1,10 +1,9 @@
 ---
 - hosts:
-    - controller
-    - worker
+    - ubuntu
   become: true
   gather_facts: true
   any_errors_fatal: true
   tasks:
-    - name: reboot
-      reboot:
+    - name: shutdown
+      shell: shutdown

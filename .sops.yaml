@@ -1,9 +1,3 @@
 ---
 creation_rules:
-  - pgp: >-
-      74476FD56282FE17B8ED3B9FBA91288143674C56, 9E7519C0C77183E62B8818145C69FF3EF2E26E3F
-
-# ---
-# creation_rules:
-#   - pgp: '9E7519C0C77183E62B8818145C69FF3EF2E26E3F'  # personal
-# # - pgp: '74476FD56282FE17B8ED3B9FBA91288143674C56'  # flux
+  - age: age1a7nyvwztvzudynvx92z6tegdxcmudhdh7fh6ty6sqs8n4gh2lelqkqk9aa
