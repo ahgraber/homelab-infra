@@ -4,6 +4,20 @@
   become: true
   gather_facts: true
   any_errors_fatal: true
+  pre_tasks:
+    - name: Verify
+      pause:
+        prompt: This will shut down the specified hosts.  Please confirm (yes/no)
+      register: confirm_shutdown
+
+    - name: Confirm
+      delegate_to: localhost
+      run_once: true
+      assert:
+        that: confirm_shutdown.user_input | bool
+        fail_msg: "Exiting at user request ..."
+        success_msg: "Continuing with shutdown ..."
+
   tasks:
     - name: shutdown
       shell: shutdown

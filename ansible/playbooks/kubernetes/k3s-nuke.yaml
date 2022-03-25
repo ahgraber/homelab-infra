@@ -6,9 +6,19 @@
   gather_facts: true
   any_errors_fatal: true
   pre_tasks:
-    - name: Pausing for 5 seconds...
+    - name: Verify
       pause:
-        seconds: 5
+        prompt: This will remove the detected k3s installation.  Please confirm (yes/no)
+      register: confirm_delete
+
+    - name: Confirm
+      delegate_to: localhost
+      run_once: true
+      assert:
+        that: confirm_delete.user_input | bool
+        fail_msg: "Exiting at user request ..."
+        success_msg: "Continuing with uninstall & removal ..."
+
     - name: Wait for availability
       wait_for_connection:
         delay: 30
