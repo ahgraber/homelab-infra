@@ -74,10 +74,10 @@ ansible -i ./inventory -l ubuntu -a '/usr/bin/systemctl reboot' --become
 ansible -i ./inventory -l ubuntu -a '/usr/bin/systemctl poweroff' --become
 
 # Ubuntu setup
-ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/ubuntu-prepare.yml
+ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/prepare.yaml
 
 # Ubuntu/apt upgrade
-ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/ubuntu-upgrade.yml
+ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/upgrade.yaml
 ```
 
 ## k3s install
@@ -88,7 +88,7 @@ ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/ubuntu-upgrade.yml
 ansible-galaxy install xanmanning.k3s
 ### assuming we're using 'kubernetes' as group identifier
 # install
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-install.yml
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-install.yaml
 # get kubeconfig file
 cp /tmp/kubeconfig ./kubeconfig
 ```

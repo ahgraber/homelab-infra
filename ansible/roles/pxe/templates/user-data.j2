@@ -25,17 +25,24 @@ autoinstall:
   network:
     version: 2
     ethernets:
-      {{ hostvars[item]['network_interface'] }}:
-        addresses:
-        - {{ hostvars[item]['ansible_host'] }}/16
-        critical: true
-        dhcp-identifier: mac
-        gateway4: {{ gateway }}
-        nameservers:
-          addresses:
-          - {{ gateway }}
+      eno1:
+        dhcp4: true
+      enp0s31f6:
+        dhcp4: true
+      enp1s0:
+        dhcp4: true
+      # {{ hostvars[item]['network_interface'] }}:
+      #   addresses:
+      #   - {{ hostvars[item]['ansible_host'] }}/16
+      #   critical: true
+      #   dhcp-identifier: mac
+      #   gateway4: {{ gateway }}
+      #   nameservers:
+      #     addresses:
+      #     - {{ gateway }}
   packages:
     - apt-transport-https
+    - build-essential
     - ca-certificates
     - cloud-init
     - curl
@@ -44,7 +51,7 @@ autoinstall:
     - gnupg
     - net-tools
     - openssh-server
-    - python
+    - python3
     - python3-apt
     - python3-pip
   update: yes
@@ -68,6 +75,8 @@ autoinstall:
   #   - {{ ssh_rsa }}
   #   - {{ ssh_ed25519 }}
   storage:
+    # layout:
+    #   name: direct
     grub:
       reorder_uefi: false
     swap:

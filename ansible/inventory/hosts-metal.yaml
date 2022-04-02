@@ -36,46 +36,46 @@ metal:
           disk: nvme0n1
           network_interface: enp0s31f6
 
-        # rock0:
-        #   ansible_host: 10.2.118.30
-        #   mac: "00:e0:4c:88:03:b7"
-        #   disk:
-        #   network_interface: enp0s31f6
-        # rock1:
-        #   ansible_host: 10.2.118.31
-        #   mac: "00:e0:4c:88:01:85"
-        #   disk:
-        #   network_interface: enp0s31f6
-        # rock2:
-        #   ansible_host: 10.2.118.32
-        #   mac: "00:e0:4c:88:04:23"
-        #   disk:
-        #   network_interface: enp0s31f6
-        # rock3:
-        #   ansible_host: 10.2.118.33
-        #   mac: "00:e0:4c:88:01:94"
-        #   disk:
-        #   network_interface: enp0s31f6
-        # rock4:
-        #   ansible_host: 10.2.118.34
-        #   mac: "00:e0:4c:88:04:d3"
-        #   disk:
-        #   network_interface: enp0s31f6
+        rock1:
+          ansible_host: 10.2.118.31
+          mac: "00:e0:4c:88:03:b7"
+          disk: mmcblk0
+          network_interface: enp1s0
+        rock2:
+          ansible_host: 10.2.118.32
+          mac: "00:e0:4c:88:01:85"
+          disk: mmcblk0
+          network_interface: enp1s0
+        rock3:
+          ansible_host: 10.2.118.33
+          mac: "00:e0:4c:88:04:23"
+          disk: mmcblk0
+          network_interface: enp1s0
+        rock4:
+          ansible_host: 10.2.118.34
+          mac: "00:e0:4c:88:04:e0"
+          disk: mmcblk0
+          network_interface: enp1s0
         # rock5:
         #   ansible_host: 10.2.118.35
-        #   mac: "00:e0:4c:88:05:0a"
-        #   disk:
-        #   network_interface: enp0s31f6
+        #   mac: "00:e0:4c:88:04:d3"
+        #   disk: mmcblk0
+        #   network_interface: enp1s0
         # rock6:
         #   ansible_host: 10.2.118.36
-        #   mac: "00:e0:4c:88:04:ff"
-        #   disk:
-        #   network_interface: enp0s31f6
+        #   mac: "00:e0:4c:88:05:0a"
+        #   disk: mmcblk0
+        #   network_interface: enp1s0
         # rock7:
         #   ansible_host: 10.2.118.37
-        #   mac: "00:e0:4c:88:04:e0"
-        #   disk:
-        #   network_interface: enp0s31f6
+        #   mac: "00:e0:4c:88:04:ff"
+        #   disk: mmcblk0
+        #   network_interface: enp1s0
+        # rock8:
+        #   ansible_host: 10.2.118.38
+        #   mac: "00:e0:4c:88:01:94"
+        #   disk: mmcblk0
+        #   network_interface: enp1s0
   # vars:
   #   ansible_user: nrl
 

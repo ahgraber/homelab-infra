@@ -62,25 +62,25 @@ We will use TrueNAS with webdav http server.
 
 ## Create PXE server
 
-1. Configure [inventory](./inventories/hosts.yml)
+1. Configure [inventory](./inventories/hosts.yaml)
 
 2. From playbook directory, run with ansible:
 
    ```sh
    # # install ansible packages
-   # ansible-galaxy collection install -r requirements.yml
+   # ansible-galaxy collection install -r requirements.yaml
    # compile pxe components, launch server, and boot
 
    # test render
-   ansible-playbook -i ./inventories/hosts.yml build.yml --tags "render" --ask-become-pass
+   ansible-playbook -i ./inventories/hosts.yaml build.yaml --tags "render" --ask-become-pass
 
    # copy cloud-config to gist?
 
    # test push to opnsense
-   ansible-playbook -i ./inventories/hosts.yml build.yml --tags "push"
+   ansible-playbook -i ./inventories/hosts.yaml build.yaml --tags "push"
 
    # full send
-   ansible-playbook -i ./inventories/hosts.yml build.yml --ask-become-pass
+   ansible-playbook -i ./inventories/hosts.yaml build.yaml --ask-become-pass
    ```
 
 ## References

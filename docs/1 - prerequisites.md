@@ -75,7 +75,7 @@ govc find -type s
 2. Update Ansible requirements
 
    ```sh
-   ansible-galaxy install -r ./ansible/requirements.yml --force
+   ansible-galaxy install -r ./ansible/requirements.yaml --force
    ```
 
 3. Update python requirements
