@@ -1,0 +1,88 @@
+---
+# ansible-playbook -i ./inventory -l nas ./playbooks/truenas/packages.yaml -K
+- hosts: nas
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Verify
+      pause:
+        prompt: This will "sideload" packages on the specified hosts.  Please confirm (yes/no)
+      register: confirm_install
+
+    - name: Confirm
+      delegate_to: localhost
+      run_once: true
+      assert:
+        that: confirm_install.user_input | bool
+        fail_msg: "Exiting at user request ..."
+        success_msg: "Continuing with install ..."
+
+  tasks:
+    # note requires "github3.py" package
+    - name: Get latest
+      delegate_to: localhost
+      community.general.github_release:
+        user: "{{ item.user }}"
+        repo: "{{ item.repo }}"
+        action: latest_release
+      register: latest
+      loop:
+        - { user: "restic", repo: "restic" }
+        - { user: "cupcakearmy", repo: "autorestic" }
+
+    - name: Debug latest
+      delegate_to: localhost
+      debug:
+        msg: "{{ item.item.repo }}: {{ item.tag }}"
+        verbosity: 2
+      loop: "{{ latest.results }}"
+
+    - name: Download
+      delegate_to: localhost
+      get_url:
+        # url: "{{ item.stdout }}"
+        url:
+          "https://github.com/{{ item.item.user }}/{{ item.item.repo }}/releases/download/{{
+          item.tag }}/{{ item.item.repo }}_{{ item.tag | regex_replace('^v', '') }}_linux_amd64.bz2"
+        dest: "{{ playbook_dir }}/{{ item.item.repo }}.bz2"
+      loop: "{{ latest.results }}"
+
+    - name: Unarchive
+      delegate_to: localhost
+      shell:
+        cmd: bzip2 -d "./{{ item.item.repo }}.bz2"
+        creates: "{{ playbook_dir }}/{{ item.item.repo }}" # skip step if file exists
+      loop: "{{ latest.results }}"
+
+    - name: Copy to remote
+      copy:
+        src: "{{ playbook_dir }}/{{ item.item.repo }}"
+        remote_src: no
+        dest: /usr/local/bin
+        force: yes
+        mode: "0755"
+      loop: "{{ latest.results }}"
+
+    - name: To Delete
+      delegate_to: localhost
+      find:
+        paths: "{{ playbook_dir }}"
+        patterns: "{{ item.item.repo }}*"
+        use_regex: false
+      register: to_delete
+      loop: "{{ latest.results }}"
+
+    - name: Debug to_delete
+      debug:
+        msg: "{{ item.path }}"
+        verbosity: 2
+      loop: "{{ to_delete.results | map(attribute='files') | flatten }}"
+
+    - name: Cleanup
+      become: true
+      delegate_to: localhost
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ to_delete.results | map(attribute='files') | flatten }}"
