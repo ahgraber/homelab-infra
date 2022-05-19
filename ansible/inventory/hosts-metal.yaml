@@ -36,26 +36,26 @@ metal:
           disk: nvme0n1
           network_interface: enp0s31f6
 
-        rock1:
-          ansible_host: 10.2.118.31
-          mac: "00:e0:4c:88:03:b7"
-          disk: mmcblk0
-          network_interface: enp1s0
-        rock2:
-          ansible_host: 10.2.118.32
-          mac: "00:e0:4c:88:01:85"
-          disk: mmcblk0
-          network_interface: enp1s0
-        rock3:
-          ansible_host: 10.2.118.33
-          mac: "00:e0:4c:88:04:23"
-          disk: mmcblk0
-          network_interface: enp1s0
-        rock4:
-          ansible_host: 10.2.118.34
-          mac: "00:e0:4c:88:04:e0"
-          disk: mmcblk0
-          network_interface: enp1s0
+        # rock1:
+        #   ansible_host: 10.2.118.31
+        #   mac: "00:e0:4c:88:03:b7"
+        #   disk: mmcblk0
+        #   network_interface: enp1s0
+        # rock2:
+        #   ansible_host: 10.2.118.32
+        #   mac: "00:e0:4c:88:01:85"
+        #   disk: mmcblk0
+        #   network_interface: enp1s0
+        # rock3:
+        #   ansible_host: 10.2.118.33
+        #   mac: "00:e0:4c:88:04:23"
+        #   disk: mmcblk0
+        #   network_interface: enp1s0
+        # rock4:
+        #   ansible_host: 10.2.118.34
+        #   mac: "00:e0:4c:88:04:e0"
+        #   disk: mmcblk0
+        #   network_interface: enp1s0
         # rock5:
         #   ansible_host: 10.2.118.35
         #   mac: "00:e0:4c:88:04:d3"

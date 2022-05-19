@@ -16,13 +16,13 @@
    export pxe_server="10.2.1.1"
    export passwd="..."
    export crypted_pass='...' # docker run --rm -it alpine:latest mkpasswd -m sha512 <password>
-   export email="ahgraber@ninerealmlabs.com"
+   export email="<EXAMPLE@DOMAIN>COM>"
    export ssh_rsa="ssh-rsa ..."
    export ssh_ed25519="ssh-ed25519 ..."
 
    # vars for k3s
    export kubevip_address="10.2.113.1"
-   export kubernetes_oidc_issuer="https://keycloak.ninerealmlabs.com/auth/realms/NineRealmLabs"
+   export kubernetes_oidc_issuer="https://keycloak.<DOMAIN>/auth/realms/<REALM>"
    export kubernetes_oidc_clientid="kubernetes"
 
    EOF
@@ -59,7 +59,7 @@ ansible all -i ./inventory --list-hosts
 ansible-inventory -i ./inventory --graph
 
 # ping hosts
-ansible all -i /path/to/inventory --one-line -m 'ping'
+ansible all -i ./inventory --one-line -m 'ping'
 ```
 
 ## Host management
@@ -78,6 +78,9 @@ ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/prepare.yaml
 
 # Ubuntu/apt upgrade
 ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/upgrade.yaml
+
+# Install additional packages on TrueNas Scale
+ansible-playbook -i ./inventory -l nas ./playbooks/truenas/packages.yaml --become
 ```
 
 ## k3s install

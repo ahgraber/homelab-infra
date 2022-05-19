@@ -1,4 +1,6 @@
 # gitignore
+.*
+
 .terraform/
 *.tfstate*
 *.lock.hcl
