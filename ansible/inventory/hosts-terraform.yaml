@@ -4,21 +4,19 @@
 #     tf-ctrl:
 #       hosts:
 #         k-ctrl-01:
-#           ansible_host: 10.2.113.10
+#           ansible_host: 10.2.113.130
 #         k-ctrl-02:
-#           ansible_host: 10.2.113.11
-#         # k-ctrl-03:
-#         #     ansible_host: 10.2.113.12
+#           ansible_host: 10.2.113.131
+#         k-ctrl-03:
+#            ansible_host: 10.2.113.132
 #     tf-work:
 #       hosts:
-#         k-ctrl-03:
-#           ansible_host: 10.2.113.12
 #         k-work-01:
-#           ansible_host: 10.2.113.30
+#           ansible_host: 10.2.113.140
 #         k-work-02:
-#           ansible_host: 10.2.113.31
+#           ansible_host: 10.2.113.141
 #         k-work-03:
-#           ansible_host: 10.2.113.32
+#           ansible_host: 10.2.113.142
 
 #   vars:
 #     network_interface: ens192

@@ -12,5 +12,9 @@ spec:
         encapsulation: "VXLANCrossSubnet"
         natOutgoing: Enabled
         nodeSelector: all()
+    nodeAddressAutodetectionV4:
+      cidrs:
+        - "{{ calico_metal_cidr }}"
+        - "{{ calico_vm_cidr }}"
   nodeMetricsPort: 9091
   typhaMetricsPort: 9093
