@@ -66,18 +66,20 @@ ansible all -i ./inventory --one-line -m 'ping'
 
 ```sh
 ### paths assume running from /ansible dir
-### assuming we're using 'ubuntu' as group identifier
+### assuming we're using 'kubernetes' as group identifier
 # reboot hosts
-ansible -i ./inventory -l ubuntu -a '/usr/bin/systemctl reboot' --become
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/reboot.yaml --become
 
 # shutdown hosts
-ansible -i ./inventory -l ubuntu -a '/usr/bin/systemctl poweroff' --become
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/shutdown.yaml --become
 
 # Ubuntu setup
-ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/prepare.yaml
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/prepare.yaml
 
 # Ubuntu/apt upgrade
-ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/upgrade.yaml
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/upgrade.yaml
+
+# ...
 
 # Install additional packages on TrueNas Scale
 ansible-playbook -i ./inventory -l nas ./playbooks/truenas/packages.yaml --become
@@ -88,7 +90,7 @@ ansible-playbook -i ./inventory -l nas ./playbooks/truenas/packages.yaml --becom
 ```sh
 ### paths assume running from /ansible dir
 # install external roles
-ansible-galaxy install xanmanning.k3s
+ansible-galaxy install xanmanning.k3s --force
 ### assuming we're using 'kubernetes' as group identifier
 # install
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-install.yaml

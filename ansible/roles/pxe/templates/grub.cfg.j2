@@ -37,9 +37,9 @@ menuentry '{{ iso_url | basename | splitext | first }} (autoinstall)' --id=autoi
     echo "Loading Kernel..."
     linux /vmlinuz \
         ip=dhcp \
-        url={{ daily_iso_url }} \
+        url={{ pxe_iso_url }} \
         autoinstall \
-        ds="nocloud-net;seedfrom={{ cloud_config_url }}"
+        ds="nocloud-net;seedfrom={{ pxe_cloudconfig_url }}"
         cloud-config-url=/dev/null
     echo "Loading Ram Disk..."
     initrd /initrd

@@ -64,7 +64,7 @@ We will use TrueNAS with webdav http server.
 
 1. Configure [inventory](./inventories/hosts.yaml)
 
-2. From playbook directory, run with ansible:
+2. From ansible directory, run with ansible:
 
    ```sh
    # # install ansible packages
@@ -72,15 +72,15 @@ We will use TrueNAS with webdav http server.
    # compile pxe components, launch server, and boot
 
    # test render
-   ansible-playbook -i ./inventories/hosts.yaml build.yaml --tags "render" --ask-become-pass
+   ansible-playbook -i ./inventory ./playbooks/pxeboot/build.yaml --tags "render" --ask-become-pass
 
    # copy cloud-config to gist?
 
    # test push to opnsense
-   ansible-playbook -i ./inventories/hosts.yaml build.yaml --tags "push"
+   ansible-playbook -i ./inventory ./playbooks/pxeboot/build.yaml --tags "push"
 
    # full send
-   ansible-playbook -i ./inventories/hosts.yaml build.yaml --ask-become-pass
+   ansible-playbook -i ./inventory ./playbooks/pxeboot/build.yaml --ask-become-pass
    ```
 
 ## References
@@ -94,8 +94,8 @@ We will use TrueNAS with webdav http server.
   and [readme](https://github.com/onedr0p/home-ops/blob/05ba831487c9dba87be3b18fca5f2815e5de697a/docs/pxe.md)
 - [automated install](https://askubuntu.com/questions/1235723/automated-20-04-server-installation-using-pxe-and-live-server-image)
 - [opn as pxe server](https://forum.opnsense.org/index.php?topic=25003.0)
-
 - [python package for pxe](https://github.com/dannf/ubuntu-server-netboot)
+- [Boot Ubuntu providing it network config in NoCloud Datasource](https://gist.github.com/smoser/635897f845f7cb56c0a7ac3018a4f476)
 
 ### grub.cfg
 
@@ -107,6 +107,7 @@ We will use TrueNAS with webdav http server.
 
 - [add cloud-init to iso](https://github.com/covertsh/ubuntu-autoinstall-generator/blob/main/ubuntu-autoinstall-generator.sh)
 - [add cloud-init to iso 2](https://forums.fogproject.org/topic/15991/ubuntu-20-04-nfs-pxe-autoinstall-automation)
+- [test cloud-init with multipass](https://multipass.run/)
 
 ## Alternatives
 

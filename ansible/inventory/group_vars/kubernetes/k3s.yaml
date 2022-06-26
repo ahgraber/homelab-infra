@@ -6,7 +6,7 @@
 
 # Use a specific version of k3s
 # for latest 'stable': https://update.k3s.io/v1-release/channels/stable
-k3s_release_version: "v1.23.4+k3s1"
+k3s_release_version: "v1.23.6+k3s1"
 
 # Install using hard links rather than symbolic links.
 # ...if you are using the system-upgrade-controller you will need to use hard links rather than symbolic links as the controller will not be able to follow symbolic links.
@@ -29,16 +29,17 @@ k3s_use_unsupported_config: false
 # If you want to use kube-vip only set this to "{{ kubevip_address }}"
 k3s_registration_address: "{{ kubevip_address }}"
 
-# (list) A list of URLs to deploy on the primary control plane. Read notes below.
-k3s_server_manifests_urls:
-  - url: https://docs.projectcalico.org/archive/v3.21/manifests/tigera-operator.yaml
-    filename: tigera-operator.yaml
-  - url: https://kube-vip.io/manifests/rbac.yaml
-    filename: kube-vip-rbac.yaml
-
 # (list) A flat list of templates to deploy on the primary control plane
 # /var/lib/rancher/k3s/server/manifests
 k3s_server_manifests_templates:
   - "calico-installation.yaml.j2"
   - "kube-vip-daemonset.yaml.j2"
   # - "kube-vip-cloud-controller-configmap.yaml.j2" # to replace metallb
+
+# (list) A list of URLs to deploy on the primary control plane. Read notes below.
+# /var/lib/rancher/k3s/server/manifests
+k3s_server_manifests_urls:
+  - url: https://docs.projectcalico.org/archive/v3.23/manifests/tigera-operator.yaml
+    filename: tigera-operator.yaml
+  - url: https://kube-vip.io/manifests/rbac.yaml
+    filename: kube-vip-rbac.yaml

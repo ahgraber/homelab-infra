@@ -20,9 +20,10 @@ autoinstall:
   network:
     version: 2
     ethernets:
-      eno1:
-        dhcp4: true
-      enp0s31f6:
+      id0:
+        match:
+          name: en*
+        wakeonlan: true
         dhcp4: true
   packages:
     - apt-transport-https

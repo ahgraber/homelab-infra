@@ -1,6 +1,11 @@
 #cloud-config
 autoinstall:
   version: 1
+  # interactive-sections:
+  #   - network
+  #   - storage
+  early-commands:
+    - systemctl stop ssh # otherwise packer tries to connect and exceed max attempts
   refresh-installer:
     update: true
   apt:
@@ -11,11 +16,6 @@ autoinstall:
       uri: http://archive.ubuntu.com/ubuntu
     - arches: [default]
       uri: http://ports.ubuntu.com/ubuntu-ports
-  # identity:
-  #   hostname: {{ hostvars[item].inventory_hostname }}
-  #   password: {{ crypted_pass }}
-  #   realname: {{ user }}
-  #   username: {{ user }}
   hostname: {{ hostvars[item].inventory_hostname }}
   keyboard:
     layout: us
@@ -25,12 +25,18 @@ autoinstall:
   network:
     version: 2
     ethernets:
-      eno1:
+      id0:
+        match:
+          # driver: ixgbe # only supported with networkd (ie, not netplan)
+          name: en*
         dhcp4: true
-      enp0s31f6:
-        dhcp4: true
-      enp1s0:
-        dhcp4: true
+        wakeonlan: true
+      # eno1:
+      #   dhcp4: true
+      # enp0s31f6:
+      #   dhcp4: true
+      # enp1s0:
+      #   dhcp4: true
       # {{ hostvars[item]['network_interface'] }}:
       #   addresses:
       #   - {{ hostvars[item]['ansible_host'] }}/16
@@ -61,22 +67,14 @@ autoinstall:
       - name: {{ user }}
         groups: [adm, audio, cdrom, dialout, floppy, video, plugdev, dip, netdev, sudo, wheel]
         lock-passwd: false
-        passwd: {{ crypted_pass }}
+        passwd: "{{ crypted_pass }}"
         shell: /bin/bash
         ssh-authorized-keys:
           - {{ ssh_rsa }}
           - {{ ssh_ed25519 }}
         sudo:
           - 'ALL=(ALL) NOPASSWD:ALL'
-  # ssh:
-  #   allow-pw: true
-  #   install-server: true
-  #   authorized-keys:
-  #   - {{ ssh_rsa }}
-  #   - {{ ssh_ed25519 }}
   storage:
-    # layout:
-    #   name: direct
     grub:
       reorder_uefi: false
     swap:
@@ -125,3 +123,7 @@ autoinstall:
       type: mount
       device: root-format-1
       path: /
+  late-commands:
+    - curtin in-target --target=/target -- echo "Please wait...will reboot automatically"
+    - curtin in-target --target=/target -- umount cdrom/
+    - reboot
