@@ -83,6 +83,9 @@ ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/upgrade.yaml
 
 # Install additional packages on TrueNas Scale
 ansible-playbook -i ./inventory -l nas ./playbooks/truenas/packages.yaml --become
+
+# Clean up rook-ceph
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-cleanup.yaml --become --ask-become-pass
 ```
 
 ## k3s install
