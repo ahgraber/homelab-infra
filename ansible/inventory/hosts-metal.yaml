@@ -3,23 +3,61 @@ metal:
   children:
     metal-ctrl:
       hosts:
-        datto0:
-          ansible_host: 10.2.118.10
-          mac: "54:b2:03:70:8b:6c"
+        optiplex0:
+          ansible_host: 10.2.118.23
+          mac: "b0:4f:13:05:c6:3a"
           disk: nvme0n1
-          network_interface: enp0s31f6
-        datto1:
-          ansible_host: 10.2.118.11
-          mac: "54:b2:03:70:26:03"
+          network_interface: enp2s0
+          # storage: "/dev/sda"
+        optiplex1:
+          ansible_host: 10.2.118.24
+          mac: "c0:25:a5:9c:65:e2"
           disk: nvme0n1
-          network_interface: enp0s31f6
-        datto2:
-          ansible_host: 10.2.118.12
-          mac: "54:b2:03:70:74:03"
+          network_interface: enp2s0
+          # storage: "/dev/sda"
+        optiplex2:
+          ansible_host: 10.2.118.25
+          mac: "b0:4f:13:04:ba:c2"
           disk: nvme0n1
-          network_interface: enp0s31f6
+          network_interface: enp2s0
+          # storage: "/dev/sda"
+
     metal-work:
       hosts:
+        optiplex3:
+          ansible_host: 10.2.118.26
+          mac: "08:92:04:d8:09:55"
+          disk: nvme0n1
+          network_interface: enp2s0
+          storage: "/dev/sda"
+        optiplex4:
+          ansible_host: 10.2.118.27
+          mac: "08:92:04:d8:07:46"
+          disk: nvme0n1
+          network_interface: enp2s0
+          storage: "/dev/sda"
+        optiplex5:
+          ansible_host: 10.2.118.28
+          mac: ""
+          disk: nvme0n1
+          network_interface: enp2s0
+          storage: "/dev/sda"
+
+        # datto0:
+        #   ansible_host: 10.2.118.10
+        #   mac: "54:b2:03:70:8b:6c"
+        #   disk: nvme0n1
+        #   network_interface: enp0s31f6
+        # datto1:
+        #   ansible_host: 10.2.118.11
+        #   mac: "54:b2:03:70:26:03"
+        #   disk: nvme0n1
+        #   network_interface: enp0s31f6
+        # datto2:
+        #   ansible_host: 10.2.118.12
+        #   mac: "54:b2:03:70:74:03"
+        #   disk: nvme0n1
+        #   network_interface: enp0s31f6
         # datto3:
         #   ansible_host: 10.2.118.20
         #   mac: "54:b2:03:71:12:90"
@@ -35,22 +73,6 @@ metal:
         #   mac: "78:f2:9e:91:7c:83"
         #   # disk: nvme0n1
         #   network_interface: enp0s31f6
-
-        optiplex0:
-          ansible_host: 10.2.118.23
-          mac: "b0:4f:13:05:c6:3a"
-          disk: nvme0n1
-          network_interface: enp2s0
-        optiplex1:
-          ansible_host: 10.2.118.24
-          mac: "c0:25:a5:9c:65:e2"
-          disk: nvme0n1
-          network_interface: enp2s0
-        optiplex2:
-          ansible_host: 10.2.118.25
-          mac: "b0:4f:13:04:ba:c2"
-          disk: nvme0n1
-          network_interface: enp2s0
 
         # rock1:
         #   ansible_host: 10.2.118.31
