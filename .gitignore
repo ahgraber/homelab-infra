@@ -12,6 +12,7 @@ kubeconfig
 # vscode-sops
 .decrypted~*.yaml
 
+ansible/collections/
 modules/terraform-vsphere/
 archive/
 
