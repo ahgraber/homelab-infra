@@ -10,3 +10,8 @@
   copy:
     src: "{{ playbook_dir }}/data/files/"
     dest: "{{pxe_path}}"
+
+- name: copy iso to server (this may take a minute)
+  copy:
+    src: "{{ playbook_dir }}/data/iso/"
+    dest: "{{pxe_path}}/iso"

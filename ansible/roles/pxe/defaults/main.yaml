@@ -1,4 +1,20 @@
 ---
+# # jammy (22.04) --------------------------------------------------------------
+# ## for localhost configuration
+# iso_url: "https://releases.ubuntu.com/jammy/ubuntu-22.04-live-server-amd64.iso"
+# iso_checksum: "sha256:84aeaf7823c8c61baa0ae862d0a06b03409394800000b3235854a6b38eb4856f"
+# efi_url: "http://archive.ubuntu.com/ubuntu/dists/jammy/main/uefi/grub2-amd64/current/grubx64.efi.signed"
+# efi_checksum: "sha256:06b136aa8ff99ec4423459aadf86071fb8e01cee992b0000a28765552b02162c"
+
+# ## use as netboot url
+# daily_iso_url: "https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/jammy-live-server-amd64.iso"
+# # daily_iso_checksum: "https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/SHA256SUMS" # then grep the correct sha
+
+# ## pxe
+# pxe_iso_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/iso/ubuntu-22.04-live-server-amd64.iso"
+# pxe_cloudconfig_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init"
+
+# focal (20.04) --------------------------------------------------------------
 ## for localhost configuration
 iso_url: "https://releases.ubuntu.com/20.04/ubuntu-20.04.4-live-server-amd64.iso"
 iso_checksum: "sha256:28ccdb56450e643bad03bb7bcf7507ce3d8d90e8bf09e38f6bd9ac298a98eaad"
@@ -7,8 +23,9 @@ efi_checksum: "sha256:f98539ffb0284eb2d45ab83602d5bbeb0605140b4240d37b0ca7f564f9
 # pxelinux_folder: "http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/installer-amd64/current/legacy-images/netboot/"
 
 ## use as netboot url
-daily_iso_url: "http://cdimage.ubuntu.com/ubuntu-server/daily-live/current/focal-live-server-amd64.iso"
+daily_iso_url: "http://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/focal-live-server-amd64.iso"
 # daily_iso_checksum: "https://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/SHA256SUMS" # then grep the correct sha
 
-## cloud-config server
-cloud_config_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init"
+## pxe
+pxe_iso_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/iso/ubuntu-20.04.4-live-server-amd64.iso"
+pxe_cloudconfig_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init/" # trailing slash is important!
