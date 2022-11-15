@@ -91,7 +91,7 @@ ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-c
 ## k3s install
 
 ```sh
-### paths assume running from /ansible dir
+### paths assume running from ansible/ dir
 # install external roles
 ansible-galaxy install xanmanning.k3s --force
 ### assuming we're using 'kubernetes' as group identifier
