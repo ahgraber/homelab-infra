@@ -74,7 +74,7 @@ ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/reboot.yaml --b
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/shutdown.yaml --become
 
 # Ubuntu setup
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/prepare.yaml
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/prepare.yaml --become --ask-become-pass
 
 # Ubuntu/apt upgrade
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/upgrade.yaml

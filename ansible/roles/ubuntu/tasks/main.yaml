@@ -3,6 +3,10 @@
   tags:
     - locale
 
+- import_tasks: user.yaml
+  tags:
+    - user
+
 - import_tasks: packages.yaml
   tags:
     - packages
@@ -26,7 +30,3 @@
 - import_tasks: unattended-upgrades.yaml
   tags:
     - unattended-upgrades
-
-- import_tasks: user.yaml
-  tags:
-    - user

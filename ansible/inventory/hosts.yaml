@@ -15,5 +15,7 @@ all:
       children:
         metal:
         terraform:
+        other:
     nas:
     router:
+    other:
