@@ -92,11 +92,12 @@ ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-c
 
 ```sh
 ### paths assume running from ansible/ dir
+cd ./ansible/
 # install external roles
 ansible-galaxy install xanmanning.k3s --force
 ### assuming we're using 'kubernetes' as group identifier
 # install
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-install.yaml
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-install.yaml --become --ask-become-pass
 # get kubeconfig file
 cp /tmp/kubeconfig ./kubeconfig
 ```
