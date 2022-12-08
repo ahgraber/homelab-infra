@@ -14,7 +14,6 @@
   - [Troubleshooting](#troubleshooting)
     - [SMART test controls](#smart-test-controls)
   - [QOL Changes](#qol-changes)
-  - [Network UPS Tools integration](#network-ups-tools-integration)
 
 ## Specs
 
@@ -152,23 +151,3 @@ done
 - [Change timeout for session](https://github.com/lietu/truenas-tools/blob/main/truenas-scale-logout-timeout-patch.sh)
 - Allow `apt` install: `chmod +x /bin/apt*`
 - Install [Eternal Terminal](https://eternalterminal.dev/download/)
-
-## Network UPS Tools integration
-
-Refs:
-<!-- markdownlint-disable MD034 -->
-- https://schnerring.net/blog/configure-nut-for-opnsense-and-truenas-with-the-cyberpower-pr750ert2u-ups/
-- https://forum.opnsense.org/index.php?topic=27936.0
-<!-- markdownlint-enable MD034 -->
-
-1. Ensure NUT configured on OPNsense (acting as NUT server)
-
-2. From both OPNsense and TrueNAS, test with:
-
-   ```sh
-   upsc <UPS_NAME>@<OPNSENSE_IP>:3493
-   ```
-
-3. Find configuration: System Settings > Services > UPS
-
-4. ![TrueNAS config](./images/TrueNAS%20UPS%20config.png)
