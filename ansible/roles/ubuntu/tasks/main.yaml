@@ -30,3 +30,8 @@
 - import_tasks: unattended-upgrades.yaml
   tags:
     - unattended-upgrades
+
+- import_tasks: ups.yaml
+  tags:
+    - ups
+    - nut

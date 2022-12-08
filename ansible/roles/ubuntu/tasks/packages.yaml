@@ -1,27 +1,4 @@
 ---
-- name: Add crowdsec key
-  shell: curl -L https://packagecloud.io/crowdsec/crowdsec/gpgkey | sudo apt-key add -
-
-- name: Add crowdsec source
-  copy:
-    content: |
-      deb https://packagecloud.io/crowdsec/crowdsec/ubuntu/ focal main
-      deb-src https://packagecloud.io/crowdsec/crowdsec/ubuntu/ focal main
-    dest: /etc/apt/sources.list.d/crowdsec_crowdsec.list
-
-- name: Add eternal terminal key
-  shell: curl -sS https://mistertea.github.io/debian-et/et.gpg | sudo apt-key add -
-
-- name: Add eternal terminal source
-  copy:
-    content: |
-      deb https://mistertea.github.io/debian-et/debian-source/ bullseye main
-    dest: /etc/apt/sources.list.d/eternal_terminal.list
-
-- name: Apt update
-  shell: apt update
-  become: true
-
 - name: Upgrade all system packages
   ansible.builtin.apt:
     upgrade: full
@@ -49,7 +26,25 @@
     - apt_install_packages is iterable
     - apt_install_packages | length > 0
 
-- name: Install crowdsec packages
+- name: Add crowdsec key
+  shell: curl -L https://packagecloud.io/crowdsec/crowdsec/gpgkey | sudo apt-key add -
+
+- name: Add crowdsec source
+  copy:
+    content: |
+      deb https://packagecloud.io/crowdsec/crowdsec/ubuntu/ focal main
+      deb-src https://packagecloud.io/crowdsec/crowdsec/ubuntu/ focal main
+    dest: /etc/apt/sources.list.d/crowdsec_crowdsec.list
+
+- name: Add eternal terminal repository
+  ansible.builtin.apt_repository:
+    repo: ppa:jgmath2000/et
+
+- name: Apt update
+  shell: apt update
+  become: true
+
+- name: Install custom packages
   ansible.builtin.apt:
     name: "{{ item }}"
     install_recommends: false
@@ -60,40 +55,30 @@
   loop:
     - crowdsec
     - crowdsec-firewall-bouncer-iptables
-
-- name: Install eternal terminal
-  ansible.builtin.apt:
-    name: "{{ item }}"
-    install_recommends: false
-    update_cache: true
-    cache_valid_time: 3600
-    autoclean: true
-    autoremove: true
-  loop:
     - et
 
-- name: Check if Raspberry Pi
-  command: grep -q  "Raspberry Pi" /proc/cpuinfo
-  ignore_errors: true
-  register: is_raspberry
+# - name: Check if Raspberry Pi
+#   command: grep -q  "Raspberry Pi" /proc/cpuinfo
+#   ignore_errors: true
+#   register: is_raspberry
 
-- name: Install raspberry specific packages for Ubuntu 21 or greater
-  ansible.builtin.apt:
-    name:
-      - linux-modules-extra-raspi
-    install_recommends: false
-    update_cache: true
-    cache_valid_time: 3600
-    autoclean: true
-    autoremove: true
-  register: apt_install_raspberry
-  retries: 5
-  until: apt_install_raspberry is success
-  when: is_raspberry and (ansible_lsb.major_release|int >= 21)
+# - name: Install raspberry specific packages for Ubuntu 21 or greater
+#   ansible.builtin.apt:
+#     name:
+#       - linux-modules-extra-raspi
+#     install_recommends: false
+#     update_cache: true
+#     cache_valid_time: 3600
+#     autoclean: true
+#     autoremove: true
+#   register: apt_install_raspberry
+#   retries: 5
+#   until: apt_install_raspberry is success
+#   when: is_raspberry and (ansible_lsb.major_release|int >= 21)
 
-- name: Gather installed packages
-  ansible.builtin.package_facts:
-    manager: auto
+# - name: Gather installed packages
+#   ansible.builtin.package_facts:
+#     manager: auto
 
 - name: Remove packages
   block:
