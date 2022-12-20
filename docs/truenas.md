@@ -14,6 +14,8 @@
   - [Troubleshooting](#troubleshooting)
     - [SMART test controls](#smart-test-controls)
   - [QOL Changes](#qol-changes)
+  - [Expanding VM Disk](#expanding-vm-disk)
+    - [Useful commands](#useful-commands)
 
 ## Specs
 
@@ -151,3 +153,79 @@ done
 - [Change timeout for session](https://github.com/lietu/truenas-tools/blob/main/truenas-scale-logout-timeout-patch.sh)
 - Allow `apt` install: `chmod +x /bin/apt*`
 - Install [Eternal Terminal](https://eternalterminal.dev/download/)
+
+## Expanding VM Disk
+
+If you have a Linux VM, which uses the LLVM filesystem, you can easily increase the disk space available to the VM.
+
+[Linux Logical Volume Manager](https://packetpushers.net/ubuntu-extend-your-default-lvm-space/) allows you to have
+logical volumes (LV) on top of logical volume groups (VG) on top of physical volumes (PV) (ie partitions).
+
+This is conceptually similar to zvols on pools on vdevs in zfs.
+
+**NOTE:** These commands may require root or 'sudo' access
+
+### Useful commands
+
+```sh
+pvs # list physical volumes
+lvs # list logical volumes
+lvdisplay # logical volume display
+pvdisplay # physical volume display
+df # disk free space
+```
+
+1. Get current status
+
+   ```sh
+   df -h  # get human-readable disks
+   lvs  # view logical volumes
+   pvs  # view physical volumes
+   ```
+
+   > In this example, we assume the `ubuntu-lv` LV is on the `ubuntu-vg` VG is on the PV `/dev/sda3`
+   > (that's partition 3 of device sda)
+
+2. Shutdown the VM.
+
+3. Edit the ZVOL in TrueNAS to change the size.
+
+4. Restart the VM.
+
+5. In the VM, run `parted` with the device id, repair the GPT information and resize the partition, as per below.
+
+   ```sh
+   parted /dev/sda
+
+   ###   in 'parted'   ###
+   # show partitions
+   print
+
+   # parted will offer to fix the GPT. Run fix with
+   f
+
+   # resize the partition (we use 3 because '/dev/sda3')
+   resizepart 3 100%
+
+      # exit 'parted'
+   ```
+
+6. Now that the partition table has been resized, we have to resize the physical volume
+
+   ```sh
+   pvdisplay # get current status
+   pvresize /dev/sda3 # resize
+   pvdisplay # check work
+   ```
+
+7. Use 'lvextend' to resize the LV and resize the the filesystem over the resized Physical Volume.
+
+   ```sh
+   lvextend --resizefs ubuntu-vg/ubuntu-lv /dev/sda3
+   ```
+
+8. Finally... you can check the freespace again.
+
+   ```sh
+   df -h
+   ```
