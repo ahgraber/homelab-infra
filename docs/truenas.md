@@ -154,7 +154,7 @@ done
 - Allow `apt` install: `chmod +x /bin/apt*`
 - Install [Eternal Terminal](https://eternalterminal.dev/download/)
 
-## Expanding VM Disk
+## [Expanding VM Disk](https://www.truenas.com/community/threads/expanding-vm-disk-size.104040/)
 
 If you have a Linux VM, which uses the LLVM filesystem, you can easily increase the disk space available to the VM.
 
