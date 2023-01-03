@@ -20,35 +20,55 @@ spec:
     spec:
       containers:
         - name: kube-vip
-          image: ghcr.io/kube-vip/kube-vip:v0.5.6
+          # renovate: registryUrl=https://ghcr.io/kube-vip
+          image: ghcr.io/kube-vip/kube-vip:v0.5.7
           imagePullPolicy: IfNotPresent
           args:
             - manager
           env:
+            # - name: vip_loglevel
+            #   value: "5"
             - name: vip_arp
               value: "true"
-            - name: vip_interface
-              value: "{{ network_interface }}"
             - name: port
               value: "6443"
+            - name: vip_interface
+              value: "{{ network_interface }}"
             - name: vip_cidr
               value: "32"
-            - name: cp_enable
+            - name: cp_enable # control-plane load balance with ARP
               value: "true"
             - name: cp_namespace
               value: kube-system
-            - name: lb_enable
-              value: "true"
-            # - name: vip_leaderelection
-            #   value: "true"
-            # - name: vip_loglevel
-            #   value: "5"
-            - name: svc_enable
-              value: "false"
             - name: vip_ddns
               value: "false"
+            - name: vip_leaderelection
+              value: "true"
+            - name: vip_leaseduration
+              value: "5"
+            - name: vip_renewdeadline
+              value: "3"
+            - name: vip_retryperiod
+              value: "1"
+            - name: lb_enable
+              value: "true"
+            - name: lb_port
+              value: "6443"
+            - name: lb_fwdmethod
+              value: local
             - name: address
               value: "{{ k3s_registration_address }}"
+            - name: prometheus_server
+              value: :2112
+            ### service load-balancing (replace metallb); requires cloud-provider deployment
+            - name: svc_enable
+              value: "false"
+            # - name: egress_podcidr # see ansible vars
+            #   value: 10.42.0.0/16
+            # - name: egress_servicecidr # see ansible vars
+            #   value: 10.43.0.0/16
+            # - name: enableServicesElection
+            #   value: "true"
           securityContext:
             capabilities:
               add:
@@ -64,12 +84,12 @@ spec:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: node-role.kubernetes.io/master
-                operator: Exists
-            - matchExpressions:
-              - key: node-role.kubernetes.io/control-plane
-                operator: Exists
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/master
+                    operator: Exists
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: Exists
       tolerations:
         - effect: NoSchedule
           operator: Exists

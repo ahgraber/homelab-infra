@@ -5,43 +5,37 @@
   become: true
   gather_facts: true
   any_errors_fatal: true
+  vars_prompt:
+    - name: nuke
+      prompt: |-
+        Are you sure you want to nuke this cluster?
+        Type YES I WANT TO DESTROY THIS CLUSTER to proceed
+      default: "n"
+      private: false
   pre_tasks:
-    - name: Verify
-      pause:
-        prompt: This will remove the detected k3s installation.  Please confirm (yes/no)
-      register: confirm_delete
+    - name: Check for confirmation
+      ansible.builtin.fail:
+        msg: Aborted nuking the cluster
+      when: nuke != 'YES I WANT TO DESTROY THIS CLUSTER'
 
-    - name: Confirm
-      delegate_to: localhost
-      run_once: true
-      assert:
-        that: confirm_delete.user_input | bool
-        fail_msg: "Exiting at user request ..."
-        success_msg: "Continuing with uninstall & removal ..."
-
-    - name: Wait for availability
-      wait_for_connection:
-        delay: 30
-        timeout: 300
-
+    - name: Pausing for 5 seconds...
+      ansible.builtin.pause:
+        seconds: 5
   tasks:
-    - name: Kill k3s
-      ansible.builtin.command: /usr/local/bin/k3s-killall.sh
     - name: Uninstall k3s
-      ansible.builtin.command:
-        cmd: /usr/local/bin/k3s-uninstall.sh
-        removes: /usr/local/bin/k3s-uninstall.sh
-    - name: Uninstall k3s agent
-      ansible.builtin.command:
-        cmd: /usr/local/bin/k3s-agent-uninstall.sh
-        removes: /usr/local/bin/k3s-agent-uninstall.sh
-    - name: Gather list of CNI files to delete
-      find:
+      ansible.builtin.include_role:
+        name: xanmanning.k3s
+        public: true
+      vars:
+        k3s_state: uninstalled
+    - name: Gather list of CNI files
+      ansible.builtin.find:
         paths: /etc/cni/net.d
         patterns: "*"
-      register: files_to_delete
+        hidden: true
+      register: directory_contents
     - name: Delete CNI files
       ansible.builtin.file:
         path: "{{ item.path }}"
         state: absent
-      loop: "{{ files_to_delete.files }}"
+      loop: "{{ directory_contents.files }}"

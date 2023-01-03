@@ -1,0 +1,174 @@
+---
+### NOTES
+# * Assumes lapi and agent are installed on each machine (equivalent to fail2ban config)
+# * this can (theoretically) be run in conjunction with crowdsec monitoring k8s virtual infra
+### REFERENCE
+# https://github.com/alf149/ansible-role-crowdsec
+# https://github.com/VeselaHouba/ansible-role-crowdsec
+- hosts: ubuntu
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  vars:
+    cs_config_file_base: /etc/crowdsec
+    cs_install_dir_agent: /usr/local/bin/
+    cs_install_dir_bouncer: /usr/local/bin
+    crowdsec_prometheus:
+      enabled: false
+    cs_bouncers:
+      # - crowdsec-firewall-bouncer
+      - crowdsec-firewall-bouncer-iptables
+    cs_collections:
+      - crowdsecurity/linux
+      - crowdsecurity/iptables
+      - crowdsecurity/base-http-scenarios
+      # - crowdsecurity/sshd # in lincrowdsecurity/linuxux
+    cs_parsers:
+      # - crowdsecurity/cri-logs
+      # - crowdsecurity/docker-logs
+      - crowdsecurity/whitelists
+    cs_whitelist_ip:
+      - "127.0.0.1"
+      - "::1"
+    cs_whitelist_cidr:
+      - 10.0.0.0/8
+      - 172.16.0.0/12
+      - 192.168.0.0/16
+    cs_postoverflows:
+      - crowdsecurity/rdns
+      - crowdsecurity/cdn-whitelist
+      - crowdsecurity/seo-bots-whitelist
+    cs_scenarios: []
+
+  pre_tasks:
+    - name: Pausing for 5 seconds...
+      pause:
+        seconds: 5
+
+    - name: Wait for availability
+      wait_for_connection:
+        delay: 30
+        timeout: 300
+
+  tasks:
+    - name: Install Crowdsec
+      block:
+        - name: Create a directory if it does not exist
+          ansible.builtin.file:
+            path: /etc/apt/keyrings
+            state: directory
+            mode: "0755"
+        - name: Add crowdsec key
+          ansible.builtin.shell: |
+            curl -fsSL https://packagecloud.io/crowdsec/crowdsec/gpgkey | gpg --dearmor > /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
+        # - name: Add crowdsec source
+        #   copy:
+        #     content: |
+        #       deb https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+        #       deb-src https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+        #     dest: /etc/apt/sources.list.d/crowdsec_crowdsec.list
+        - name: Add crowdsec apt repository
+          ansible.builtin.apt_repository:
+            repo: deb https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+            state: present
+            filename: crowdsec
+        - name: Add crowdsec src repository
+          ansible.builtin.apt_repository:
+            repo: deb-src https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+            state: present
+            filename: crowdsec-src
+            update_cache: yes
+        - name: Install crowdsec packages
+          ansible.builtin.apt:
+            name: crowdsec
+            state: present
+            update_cache: yes
+        - name: crowdsec - cscli bash completion
+          # ansible.builtin.shell: "cscli completion bash | sudo tee /etc/bash_completion.d/cscli"
+          ansible.builtin.shell: "cscli completion bash | tee /etc/bash_completion.d/cscli"
+          register: bash_completion_result
+          changed_when: "'# bash completion for' not in bash_completion_result.stdout"
+          failed_when: "'Error' in bash_completion_result.stderr"
+
+    - name: Install bouncers
+      block:
+        - name: Install bouncer (currently only firewall)
+          ansible.builtin.apt:
+            name: "{{ cs_bouncers }}"
+            state: present
+            update_cache: true
+          when: cs_bouncers | length > 0
+        # TODO: enroll bouncers
+
+    - name: Install collections
+      become: true
+      ansible.builtin.shell: "cscli collections install {{ item }}"
+      with_items: "{{ cs_collections }}"
+      when: cs_collections | length > 0
+
+    - name: Install parsers
+      become: true
+      ansible.builtin.shell: "cscli parsers install {{ item }}"
+      with_items: "{{ cs_parsers }}"
+      when: cs_parsers | length > 0
+
+    - name: Install postoverflows
+      become: true
+      ansible.builtin.shell: "cscli postoverflows install {{ item }}"
+      with_items: "{{ cs_postoverflows }}"
+      when: cs_postoverflows | length > 0
+
+    - name: Install scenarios
+      become: true
+      ansible.builtin.shell: "cscli scenarios install {{ item }}"
+      with_items: "{{ cs_scenarios }}"
+      when: cs_scenarios | length > 0
+
+    - name: Configure
+      block:
+        - name: Main config
+          template:
+            src: crowdsec/config.yaml.j2
+            dest: "{{ cs_config_file_base }}/config.yaml"
+            owner: root
+            group: root
+            mode: 0644
+        - name: Set whitelist
+          template:
+            src: crowdsec/whitelist.yaml.j2
+            dest: "{{ cs_config_file_base }}/parsers/s02-enrich/local_whitelist.yaml"
+            owner: root
+            group: root
+            mode: 0644
+          when: (cs_whitelist_ip | length > 0) or (cs_whitelist_cidr | length > 0)
+        - name: Journalctl
+          blockinfile:
+            path: "{{ cs_config_file_base }}/acquis.yaml"
+            insertafter: EOF
+            block: |
+              ---
+              source: journalctl
+              journalctl_filter:
+                - "_SYSTEMD_UNIT=ssh.service"
+              labels:
+                type: journald"
+              ---
+            backup: yes
+        - name: Flush handlers to apply config
+          meta: flush_handlers
+
+    - name: Enroll instance to console
+      become: true
+      ansible.builtin.shell: "cscli console enroll --name {{ inventory_hostname }} {{ crowdsec_token }}"
+      when: crowdsec_token is defined
+
+    - name: Restart crowdsec
+      block:
+        - name: Restart crowdsec service
+          systemd:
+            name: crowdsec
+            state: restarted
+        - name: Restart crowdsec-firewall-bouncer service
+          systemd:
+            name: crowdsec-firewall-bouncer
+            state: restarted

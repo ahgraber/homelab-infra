@@ -9,7 +9,9 @@ k3s_control_node: false
 k3s_agent:
   node-ip: "{{ ansible_host }}"
   kubelet-arg:
-    # Enables the kubelet to gracefully evict pods during a node shutdown
-    - "feature-gates=GracefulNodeShutdown=true"
-    # Allow k8s services to contain TCP and UDP on the same port
-    - "feature-gates=MixedProtocolLBService=true"
+    - "feature-gates=GracefulNodeShutdown=true" # Enables the kubelet to gracefully evict pods during a node shutdown
+    - "feature-gates=MixedProtocolLBService=true" # Allow k8s services to contain TCP and UDP on the same port
+    # https://github.com/k3s-io/k3s/issues/1264
+    - "node-status-update-frequency=4s"
+  node-label:
+    - "node-role.kubernetes.io/worker=true"

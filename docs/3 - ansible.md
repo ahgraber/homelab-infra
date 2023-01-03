@@ -14,7 +14,7 @@
    # vars for pxe/ubuntu ansible
    export gateway="10.2.0.1"
    export pxe_server="10.2.1.1"
-   export passwd="..."
+   export default_pass="..."
    export crypted_pass='...' # docker run --rm -it alpine:latest mkpasswd -m sha512 <password>
    export email="<EXAMPLE@DOMAIN>COM>"
    export ssh_rsa="ssh-rsa ..."
@@ -22,11 +22,11 @@
 
    # vars for k3s
    export kubevip_address="10.2.113.1"
-   export kubernetes_oidc_issuer="https://keycloak.<DOMAIN>/auth/realms/<REALM>"
-   export kubernetes_oidc_clientid="kubernetes"
-
+   export calico_node_cidr="10.2.118.0/24"
    EOF
+   ```
 
+   ```sh
    direnv allow .
    ```
 
@@ -69,15 +69,18 @@ ansible all -i ./inventory --one-line -m 'ping'
 ### assuming we're using 'kubernetes' as group identifier
 # reboot hosts
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/reboot.yaml --become
+ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/reboot.yaml --become
 
 # shutdown hosts
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/shutdown.yaml --become
+ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/shutdown.yaml --become
 
 # Ubuntu setup
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/prepare.yaml --become --ask-become-pass
+ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/os-init.yaml --become --ask-become-pass
+ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/crowdsec.yaml --become --ask-become-pass
 
 # Ubuntu/apt upgrade
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/upgrade.yaml
+ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/upgrade.yaml
 
 # ...
 

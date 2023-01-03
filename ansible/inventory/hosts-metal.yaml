@@ -49,6 +49,9 @@ nas:
       ansible_host: 10.2.1.1
       ansible_user: root
       pxe_path: "/mnt/ssdpool/pxeboot/"
+    github_runner:
+      ansible_host: 10.2.1.11
+      ansible_user: nrl
 
 router:
   hosts:

@@ -1,12 +1,11 @@
 ---
 ansible_user: ${user}
-ssh_authorized_keys:
-  - ${ssh_rsa}
-  - ${ssh_ed25519}
 
 domain: ${domain}
+
+### kube-vip
 kubevip_address: ${kubevip_address}
-calico_vm_cidr: ${calico_vm_cidr}
-calico_metal_cidr: ${calico_metal_cidr}
-kubernetes_oidc_issuer: ${kubernetes_oidc_issuer}
-kubernetes_oidc_clientid: ${kubernetes_oidc_clientid}
+
+### calico
+calico_encapsulation: "None"
+calico_node_cidr: ${calico_node_cidr}

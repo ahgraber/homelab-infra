@@ -18,7 +18,7 @@
         - domain
         - gateway
         - user
-        - passwd
+        - default_pass
         - crypted_pass
         - email
       # vars:
@@ -35,7 +35,7 @@
         - domain
         - gateway
         - user
-        - passwd
+        - default_pass
         - crypted_pass
         - email
 
