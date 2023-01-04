@@ -8,11 +8,12 @@
 *.ova
 .env
 .envrc
-kubeconfig
+*kubeconfig*
 # vscode-sops
 .decrypted~*.yaml
 
 ansible/collections/
+ansible/facts_cache/
 modules/terraform-vsphere/
 archive/
 

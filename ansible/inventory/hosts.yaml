@@ -1,16 +1,21 @@
 ---
 all:
+  vars:
+    ansible_ssh_port: 22
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
   children:
     kubernetes:
+      vars:
+        ansible_user: root
       children:
         controller:
           children:
             metal-ctrl:
-            tf-ctrl:
+            # tf-ctrl:
         worker:
           children:
             metal-work:
-            tf-work:
+            # tf-work:
     ubuntu:
       children:
         metal:

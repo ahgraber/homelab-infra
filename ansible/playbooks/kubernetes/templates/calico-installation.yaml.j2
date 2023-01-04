@@ -4,6 +4,8 @@ kind: Installation
 metadata:
   name: default
 spec:
+  registry: quay.io
+  imagePath: calico
   calicoNetwork:
     # Note: The ipPools section cannot be modified post-install.
     ipPools:
@@ -12,6 +14,8 @@ spec:
         encapsulation: "VXLANCrossSubnet"
         natOutgoing: Enabled
         nodeSelector: all()
+    linuxDataplane: Iptables
+    multiInterfaceMode: None
     nodeAddressAutodetectionV4:
       cidrs:
         - "{{ calico_node_cidr }}"

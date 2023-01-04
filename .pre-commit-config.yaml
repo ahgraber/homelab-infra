@@ -19,11 +19,11 @@ repos:
       - id: fix-ligatures
   - repo: local
     hooks:
-      - id: fix-yml
-        name: yml-to-yaml
-        entry: .precommit/to_yaml.sh
-        language: script
-        pass_filenames: false
+      - id: forbid-yml
+        name: Forbid .yml file extensions (use .yaml)
+        entry: YAML file extension must be .yaml
+        language: fail
+        files: \.yml$
       # - id: env-substitute
       #   name: envvar-substitute
       #   entry: .precommit/substitute.sh

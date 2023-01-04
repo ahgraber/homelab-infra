@@ -21,7 +21,6 @@ metal:
           disk: nvme0n1
           network_interface: enp2s0
           # storage: "/dev/sda"
-
     metal-work:
       hosts:
         optiplex3:
@@ -58,9 +57,8 @@ router:
     opnsense:
       ansible_host: 10.0.0.1
       ansible_user: admin
-
-other:
-  hosts:
-    zima:
-      ansible_host: 10.2.0.229
-      ansible_user: nrl
+# other:
+#   hosts:
+#     zima:
+#       ansible_host: 10.2.0.229
+#       ansible_user: nrl

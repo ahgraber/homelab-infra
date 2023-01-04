@@ -36,12 +36,12 @@ k3s_server:
     - "bind-address=0.0.0.0" # Required to monitor kube-scheduler with kube-prometheus-stack
   etcd-expose-metrics: true # Required to monitor etcd with kube-prometheus-stack
   kube-apiserver-arg:
-    # Required for HAProxy health-checks
+    ### Required for HAProxy health-checks
     - "anonymous-auth=true"
-    # # - "anonymous-auth=false"
-    - "--audit-log-path=/var/lib/rancher/k3s/audit.log"
-    - "--audit-policy-file=/var/lib/rancher/k3s/audit-policy.yaml"
-    - "--audit-log-maxage=2"
+    ### enable if setting audit-policy
+    # - "--audit-log-path=/var/lib/rancher/k3s/audit.log"
+    # - "--audit-policy-file=/var/lib/rancher/k3s/audit-policy.yaml"
+    # - "--audit-log-maxage=2"
     # https://github.com/k3s-io/k3s/issues/1264
     - "default-not-ready-toleration-seconds=20"
     - "default-unreachable-toleration-seconds=20"
@@ -51,7 +51,5 @@ k3s_server:
     # - "oidc-username-claim=email" # sub
     # - "oidc-groups-claim=groups"
     # - "oidc-groups-prefix=oidc:"
-  # node-label:
-  #   - "node-role.kubernetes.io/master=true"
   node-taint:
-    - "node-role.kubernetes.io/master=true:NoSchedule"
+    - "node-role.kubernetes.io/control-plane=true:NoSchedule"

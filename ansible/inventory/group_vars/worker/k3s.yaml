@@ -13,5 +13,5 @@ k3s_agent:
     - "feature-gates=MixedProtocolLBService=true" # Allow k8s services to contain TCP and UDP on the same port
     # https://github.com/k3s-io/k3s/issues/1264
     - "node-status-update-frequency=4s"
-  node-label:
-    - "node-role.kubernetes.io/worker=true"
+  # node-label:
+  #   - "node.kubernetes.io/worker=true"
