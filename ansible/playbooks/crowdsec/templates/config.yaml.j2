@@ -30,12 +30,18 @@ api:
     credentials_path: /etc/crowdsec/local_api_credentials.yaml
   server:
     log_level: info
+{% if cs_multiserver %}
+    listen_uri: {{ cs_delegate_server_listen_uri }}
+{% else %}
     listen_uri: 127.0.0.1:8080
+{% endif %}
     profiles_path: /etc/crowdsec/profiles.yaml
     online_client: # Crowdsec API credentials (to push signals and receive bad IPs)
       credentials_path: /etc/crowdsec/online_api_credentials.yaml
+     # IP ranges, or IPs which can have admin API access
+    trusted_ips: {{ cs_whitelist_ip|to_yaml }}
 prometheus:
-  enabled: {{ crowdsec_prometheus.enabled }}
+  enabled: {{ cs_prometheus.enabled }}
   level: full
   listen_addr: 127.0.0.1
   listen_port: 6060

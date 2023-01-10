@@ -1,0 +1,89 @@
+---
+### NOTES
+# * Assumes lapi and agent are installed on each machine (equivalent to fail2ban config)
+# * this can (theoretically) be run in conjunction with crowdsec monitoring k8s virtual infra
+### REFERENCE
+# https://github.com/alf149/ansible-role-crowdsec
+# https://github.com/VeselaHouba/ansible-role-crowdsec
+
+- hosts: crowdsec
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  vars:
+    # requires add'l setup
+    # see group_vars/crowdsec
+    cs_multiserver: true
+
+    cs_config_file_base: /etc/crowdsec
+    cs_install_dir_agent: /usr/local/bin/
+    cs_install_dir_bouncer: /usr/local/bin
+
+    cs_bouncers:
+      - crowdsec-firewall-bouncer-nftables
+      # - crowdsec-firewall-bouncer-iptables
+    cs_collections:
+      - crowdsecurity/nginx
+      - crowdsecurity/apache2
+      - crowdsecurity/sshd
+      - crowdsecurity/linux
+      - crowdsecurity/iptables
+      - crowdsecurity/http-cve
+    cs_scenarios:
+      - crowdsecurity/apache_log4j2_cve-2021-44228
+      - crowdsecurity/http-cve-2021-42013
+    cs_parsers:
+      - crowdsecurity/cri-logs
+      - crowdsecurity/docker-logs
+      - crowdsecurity/apache2-logs
+      - crowdsecurity/whitelists
+    cs_postoverflows:
+      - crowdsecurity/rdns
+      - crowdsecurity/cdn-whitelist
+      - crowdsecurity/seo-bots-whitelist
+    cs_prometheus:
+      enabled: false
+
+  pre_tasks:
+    - name: Pausing for 5 seconds...
+      pause:
+        seconds: 5
+    - name: Wait for availability
+      wait_for_connection:
+        delay: 0
+        timeout: 300
+
+  tasks:
+    - include_tasks: "{{ playbook_dir }}/install/install.yaml"
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - include_tasks: "{{ playbook_dir }}/install/register-agents.yaml"
+      when:
+        - "'crowdsec_agents' in group_names"
+        - cs_multiserver
+
+    - include_tasks: "{{ playbook_dir }}/install/register-bouncers.yaml"
+      loop: "{{ cs_bouncers }}"
+      when:
+        - "'crowdsec_agents' in group_names"
+        - cs_multiserver
+
+    - name: Restart crowdsec (agent)
+      block:
+        - name: Restart crowdsec service
+          systemd:
+            name: crowdsec
+            daemon_reload: true
+            state: restarted
+        - name: Restart crowdsec-firewall-bouncer service
+          systemd:
+            name: crowdsec-firewall-bouncer
+            state: restarted
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Restart crowdsec (LAPI)
+      shell: /usr/local/etc/rc.d/crowdsec restart
+      when:
+        - "'crowdsec_lapi_server' in group_names"

@@ -60,6 +60,7 @@ ansible-inventory -i ./inventory --graph
 
 # ping hosts
 ansible all -i ./inventory --one-line -m 'ping'
+ansible all -i ./inventory --one-line -m 'ping' -vvv # for debugging
 ```
 
 ## Host management
@@ -83,10 +84,12 @@ ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/shutdown.yaml --bec
 
 # Ubuntu setup
 ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/os-init.yaml --become --ask-become-pass
-ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/crowdsec.yaml --become --ask-become-pass
 
 # Ubuntu/apt upgrade
 ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/upgrade.yaml
+
+# Crowdsec setup
+ansible-playbook -i ./inventory -l crowdsec ./playbooks/crowdsec/crowdsec.yaml --become
 
 # ...
 
@@ -94,7 +97,7 @@ ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/upgrade.yaml
 ansible-playbook -i ./inventory -l nas ./playbooks/truenas/packages.yaml --become
 
 # Clean up rook-ceph
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-cleanup.yaml --become --ask-become-pass
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-cleanup.yaml --become # --ask-become-pass
 ```
 
 ## k3s install
@@ -119,3 +122,14 @@ kubectl --kubeconfig=${KUBECONFIG} get pods -A
 ```
 
 See [homelab-gitops-k3s](https://github.com/ahgraber/homelab-gitops-k3s)
+
+## k3s uninstall
+
+```sh
+# uninstall
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-nuke.yaml --become --ask-become-pass
+# clean up rook-ceph
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-cleanup.yaml --become --ask-become-pass
+# reboot
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/reboot.yaml --become
+```

@@ -1,12 +1,15 @@
 ---
 all:
   vars:
+    # ansible_pass: "{{ lookup('env', 'default_pass') }}"
+    # ansible_become_pass: "{{ lookup('env', 'default_pass') }}"
     ansible_ssh_port: 22
     ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+
   children:
     kubernetes:
-      vars:
-        ansible_user: root
+      # vars:
+      #   ansible_user: root
       children:
         controller:
           children:
@@ -21,6 +24,24 @@ all:
         metal:
         terraform:
         other:
-    nas:
-    router:
+    crowdsec:
+      children:
+        crowdsec_lapi_server:
+          hosts:
+            opnsense:
+        crowdsec_agents:
+          children:
+            ubuntu:
+    infra:
+      hosts:
+        opnsense:
+          # ansible_host: 10.0.0.1
+          # ansible_user: admin
+        truenas:
+          # ansible_host: 10.2.1.1
+          # ansible_user: admin
+          # pxe_path: "/mnt/ssdpool/pxeboot/"
+        # github_runner:
+        #   ansible_host: 10.2.1.11
+        #   ansible_user: nrl
     other:

@@ -8,10 +8,9 @@
     - name: Pausing for 5 seconds...
       pause:
         seconds: 5
-
     - name: Wait for availability
       wait_for_connection:
-        delay: 30
+        delay: 0
         timeout: 300
 
   tasks:
