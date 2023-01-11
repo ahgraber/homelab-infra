@@ -6,7 +6,7 @@ site_author: Alex Graber
 site_url: https://ahgraber.github.io/homelab-infra/
 
 # Repository
-repo_name: ahgraber/homelab-gitops-k3s
+repo_name: ahgraber/homelab-infra
 repo_url: https://github.com/ahgraber/homelab-infra
 edit_uri: "edit/main/docs/"
 
