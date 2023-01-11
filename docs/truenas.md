@@ -55,7 +55,7 @@
 
 ### Storage Pool
 
-1. In console, run `geom disk list` to see names/ids of all identified disks
+1. In console, run `geom disk list` to see names/IDs of all identified disks
 2. Set up zpool
 3. (OPTIONAL)[Set NVME ssd as L2ARC](https://blog.programster.org/zfs-add-l2arc) with **`zpool add <pool_name> cache /dev/<drive_id>`**
 4. Set OPTANE as SLOG with **`zpool add <pool_name> log /dev/<drive_id>`**
@@ -192,7 +192,7 @@ df # disk free space
 
 4. Restart the VM.
 
-5. In the VM, run `parted` with the device id, repair the GPT information and resize the partition, as per below.
+5. In the VM, run `parted` with the device ID, repair the GPT information and resize the partition, as per below.
 
    ```sh
    parted /dev/sda
