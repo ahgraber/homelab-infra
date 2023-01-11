@@ -1,0 +1,16 @@
+---
+exclude_paths:
+  - "*.sops.yaml"
+skip_list:
+  # replicate yamllint config
+  - yaml[comments-indentation]
+  - yaml[line-length]
+  - var-naming
+warn_list:
+  - command-instead-of-shell
+  - deprecated-command-syntax
+  - experimental
+  - no-changed-when
+kinds:
+  - playbook: "**/playbooks/*.{yml,yaml}"
+  - tasks: "**/playbooks/crowdsec/install/*.{yml,yaml}"

@@ -52,33 +52,33 @@
         - name: Packages | Remove leaf packages
           ansible.builtin.apt:
             autoremove: true
-        # - name: Remove packages
-        #   ansible.builtin.apt:
-        #     name: "{{ packages_remove }}"
-        #     state: absent
-        #     autoremove: true
-        # - name: Remove cloud-init files
-        #   ansible.builtin.file:
-        #     state: absent
-        #     path: "{{ item }}"
-        #   loop:
-        #     - "/etc/cloud"
-        #     - "/var/lib/cloud"
-        #   when:
-        #     - "'cloud-init' in apt_remove_packages"
-        # - name: Remove snapd files
-        #   ansible.builtin.file:
-        #     state: absent
-        #     path: "{{ item }}"
-        #   loop:
-        #     - "/home/{{ ansible_user }}/.snap"
-        #     - "/snap"
-        #     - "/var/snap"
-        #     - "/var/lib/snapd"
-        #     - "/var/cache/snapd"
-        #     - "/usr/lib/snapd"
-        #   when:
-        #     - "'snapd' in apt_remove_packages"
+    # - name: Remove packages
+    #   ansible.builtin.apt:
+    #     name: "{{ packages_remove }}"
+    #     state: absent
+    #     autoremove: true
+    # - name: Remove cloud-init files
+    #   ansible.builtin.file:
+    #     state: absent
+    #     path: "{{ item }}"
+    #   loop:
+    #     - "/etc/cloud"
+    #     - "/var/lib/cloud"
+    #   when:
+    #     - "'cloud-init' in apt_remove_packages"
+    # - name: Remove snapd files
+    #   ansible.builtin.file:
+    #     state: absent
+    #     path: "{{ item }}"
+    #   loop:
+    #     - "/home/{{ ansible_user }}/.snap"
+    #     - "/snap"
+    #     - "/var/snap"
+    #     - "/var/lib/snapd"
+    #     - "/var/cache/snapd"
+    #     - "/usr/lib/snapd"
+    #   when:
+    #     - "'snapd' in apt_remove_packages"
 
     - name: User Configuration
       tags: [user, setup]
@@ -110,8 +110,7 @@
             name: "{{ item }}"
             fstype: swap
             state: absent
-          loop: ["none", "swap"]
-
+          loop: [none, swap]
         - name: network ups tools
           when: "'metal' in {{ group_names }}"
           block:

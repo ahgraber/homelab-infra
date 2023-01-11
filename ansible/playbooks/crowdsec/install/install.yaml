@@ -8,9 +8,14 @@
             path: /etc/apt/keyrings
             state: directory
             mode: "0755"
+        # - name: Add crowdsec key
+        #   ansible.builtin.shell: |
+        #     curl -fsSL https://packagecloud.io/crowdsec/crowdsec/gpgkey | gpg --dearmor > /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
         - name: Add crowdsec key
-          ansible.builtin.shell: |
-            curl -fsSL https://packagecloud.io/crowdsec/crowdsec/gpgkey | gpg --dearmor > /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
+          ansible.builtin.apt_key:
+            url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
+            state: present
+            keyring: /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
         - name: Add crowdsec apt repository
           ansible.builtin.apt_repository:
             repo: deb https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
@@ -27,9 +32,8 @@
             name: crowdsec
             state: present
             update_cache: true
-        - name: crowdsec - cscli bash completion
-          # ansible.builtin.shell: "cscli completion bash | sudo tee /etc/bash_completion.d/cscli"
-          ansible.builtin.shell: "cscli completion bash | tee /etc/bash_completion.d/cscli"
+        - name: Install cscli bash completion
+          ansible.builtin.shell: cscli completion bash | tee /etc/bash_completion.d/cscli
           register: bash_completion_result
           changed_when: "'# bash completion for' not in bash_completion_result.stdout"
           failed_when: "'Error' in bash_completion_result.stderr"
@@ -43,25 +47,25 @@
 
     - name: Install collections
       # become: true
-      ansible.builtin.command: "cscli collections install {{ item }}"
+      ansible.builtin.command: cscli collections install {{ item }}
       with_items: "{{ cs_collections }}"
       when: cs_collections | length > 0
 
     - name: Install parsers
       # become: true
-      ansible.builtin.command: "cscli parsers install {{ item }}"
+      ansible.builtin.command: cscli parsers install {{ item }}
       with_items: "{{ cs_parsers }}"
       when: cs_parsers | length > 0
 
     - name: Install postoverflows
       # become: true
-      ansible.builtin.command: "cscli postoverflows install {{ item }}"
+      ansible.builtin.command: cscli postoverflows install {{ item }}
       with_items: "{{ cs_postoverflows }}"
       when: cs_postoverflows | length > 0
 
     - name: Install scenarios
       # become: true
-      ansible.builtin.command: "cscli scenarios install {{ item }}"
+      ansible.builtin.command: cscli scenarios install {{ item }}
       with_items: "{{ cs_scenarios }}"
       when: cs_scenarios | length > 0
 
@@ -83,7 +87,7 @@
             mode: 0644
           when: (cs_whitelist_ip | length > 0) or (cs_whitelist_cidr | length > 0)
         - name: Watch services via Journalctl
-          blockinfile:
+          ansible.builtin.blockinfile:
             path: "{{ cs_config_file_base }}/acquis.yaml"
             insertafter: EOF
             block: |
@@ -96,10 +100,10 @@
               ---
             backup: true
         - name: Flush handlers to apply config
-          meta: flush_handlers
+          ansible.builtin.meta: flush_handlers
 
 - name: Enroll instance to web console
-  ansible.builtin.command: "cscli console enroll --name {{ inventory_hostname }} {{ cs_token }}"
+  ansible.builtin.command: cscli console enroll --name {{ inventory_hostname }} {{ cs_token }}
   when:
     - cs_token is defined
     - not cs_multiserver

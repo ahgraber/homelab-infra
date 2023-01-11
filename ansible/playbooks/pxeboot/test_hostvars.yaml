@@ -19,9 +19,7 @@
 
     - debug: # "{{ item['inventory_hostname']['mac'] }}"
         var: "{{ hostvars[item]['ansible_host'] }}"
-      with_items:
-        # return [host: {key1: value1, k2: value2, ...}]
-        "{{ groups['nodes'] | default([]) }}"
+      with_items: "{{ groups['nodes'] | default([]) }}"
       when: hostvars[item]
 
     # ### this works, but creates duplicate entries

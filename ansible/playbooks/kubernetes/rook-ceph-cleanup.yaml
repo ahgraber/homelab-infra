@@ -21,8 +21,8 @@
       run_once: true
       assert:
         that: confirm_remove.user_input | bool
-        fail_msg: "Exiting at user request ..."
-        success_msg: "Continuing with cleanup ..."
+        fail_msg: Exiting at user request ...
+        success_msg: Continuing with cleanup ...
 
   tasks:
     # - name: Patch cephcluster
@@ -88,7 +88,7 @@
     - name: Delete rook files
       become: true
       ansible.builtin.file:
-        path: "/var/lib/rook/"
+        path: /var/lib/rook/
         state: absent
 
     - name: Format drives

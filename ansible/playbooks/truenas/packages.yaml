@@ -15,8 +15,8 @@
       run_once: true
       assert:
         that: confirm_install.user_input | bool
-        fail_msg: "Exiting at user request ..."
-        success_msg: "Continuing with install ..."
+        fail_msg: Exiting at user request ...
+        success_msg: Continuing with install ...
 
   tasks:
     # note requires "github3.py" package
@@ -28,8 +28,8 @@
         action: latest_release
       register: latest
       loop:
-        - { user: "restic", repo: "restic" }
-        - { user: "cupcakearmy", repo: "autorestic" }
+        - { user: restic, repo: restic }
+        - { user: cupcakearmy, repo: autorestic }
 
     - name: Debug latest
       delegate_to: localhost
@@ -40,23 +40,23 @@
 
     - name: Download
       delegate_to: localhost
-      get_url:
+      ansible.builtin.get_url:
         # url: "{{ item.stdout }}"
         url:
-          "https://github.com/{{ item.item.user }}/{{ item.item.repo }}/releases/download/{{ item.tag }}/{{
-          item.item.repo }}_{{ item.tag | regex_replace('^v', '') }}_linux_amd64.bz2"
+          https://github.com/{{ item.item.user }}/{{ item.item.repo }}/releases/download/{{ item.tag }}/{{
+          item.item.repo }}_{{ item.tag | regex_replace('^v', '') }}_linux_amd64.bz2
         dest: "{{ playbook_dir }}/{{ item.item.repo }}.bz2"
       loop: "{{ latest.results }}"
 
     - name: Unarchive
       delegate_to: localhost
-      shell:
+      ansible.builtin.shell:
         cmd: bzip2 -d "./{{ item.item.repo }}.bz2"
         creates: "{{ playbook_dir }}/{{ item.item.repo }}" # skip step if file exists
       loop: "{{ latest.results }}"
 
     - name: Copy to remote
-      copy:
+      ansible.builtin.copy:
         src: "{{ playbook_dir }}/{{ item.item.repo }}"
         remote_src: false
         dest: /usr/local/bin
@@ -66,7 +66,7 @@
 
     - name: To Delete
       delegate_to: localhost
-      find:
+      ansible.builtin.find:
         paths: "{{ playbook_dir }}"
         patterns: "{{ item.item.repo }}*"
         use_regex: false
@@ -82,7 +82,7 @@
     - name: Cleanup
       become: true
       delegate_to: localhost
-      file:
+      ansible.builtin.file:
         path: "{{ item.path }}"
         state: absent
       loop: "{{ to_delete.results | map(attribute='files') | flatten }}"

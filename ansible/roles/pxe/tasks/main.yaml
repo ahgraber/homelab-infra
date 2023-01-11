@@ -11,8 +11,8 @@
     - passwd
     - crypted_pass
     - email
-  # vars:
-  #   envrc: {}
+# vars:
+#   envrc: {}
 
 # - debug:
 #     var: '{{item}}'
@@ -55,7 +55,7 @@
 - name: Extract the ISO
   become: true
   ansible.builtin.command:
-    cmd: "xorriso -osirrox on -indev {{ iso.dest }} -extract / {{ playbook_dir }}/data/os"
+    cmd: xorriso -osirrox on -indev {{ iso.dest }} -extract / {{ playbook_dir }}/data/os
     creates: "{{ playbook_dir }}/data/os/.treeinfo"
 
 - name: Copy required files from extract
@@ -70,9 +70,9 @@
 # ref: https://askubuntu.com/questions/1235723/automated-20-04-server-installation-using-pxe-and-live-server-image
 - name: Download signed grub netboot EFI
   ansible.builtin.get_url:
-    url: "http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/uefi/grub2-amd64/current/grubnetx64.efi.signed"
+    url: http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/uefi/grub2-amd64/current/grubnetx64.efi.signed
     dest: "{{ item }}"
-    checksum: "sha256:442a13ce54100d4f51b1ec68d495a6eacf9fd06b862ed3ed51ec5ae159f18f84"
+    checksum: sha256:442a13ce54100d4f51b1ec68d495a6eacf9fd06b862ed3ed51ec5ae159f18f84
   # register: efi
   loop:
     - "{{ playbook_dir }}/data/files/grubnetx64.efi.signed"

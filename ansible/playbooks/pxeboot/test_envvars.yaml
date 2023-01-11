@@ -21,8 +21,8 @@
         - default_pass
         - crypted_pass
         - email
-      # vars:
-      #   envrc: {}
+    # vars:
+    #   envrc: {}
 
     - debug:
         var: "{{item}}"

@@ -29,8 +29,8 @@
       run_once: true
       assert:
         that: confirm_uninstall.user_input | bool
-        fail_msg: "Exiting at user request ..."
-        success_msg: "Continuing with uninstall ..."
+        fail_msg: Exiting at user request ...
+        success_msg: Continuing with uninstall ...
     - name: Wait for availability
       wait_for_connection:
         delay: 10
@@ -74,7 +74,7 @@
 
     - name: Remove agent (lapi)
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
-      command: "cscli machines remove {{ inventory_hostname }}"
+      command: cscli machines remove {{ inventory_hostname }}
       # ignore_errors: true
       when:
         # - cs_multiserver
@@ -82,7 +82,7 @@
 
     - name: Remove bouncer
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
-      command: "cscli bouncer remove {{ inventory_hostname }}-{{ item }}"
+      command: cscli bouncer remove {{ inventory_hostname }}-{{ item }}
       loop: "{{ cs_bouncers }}"
       # ignore_errors: true
       when:

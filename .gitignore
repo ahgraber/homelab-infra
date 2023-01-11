@@ -1,25 +1,52 @@
 # gitignore
-.*
+# Editors
+.vscode/
+.monokle
+*.profraw
+# Trash
+.DS_Store
+Thumbs.db
+*.iso
 
+# secrets
+*kubeconfig*
+*key*
+*.pem
+*.pgp
+*.pub
+.decrypted~*.yaml
+.env
+.envrc
+
+# terraform
 .terraform/
 *.tfstate*
 *.lock.hcl
 *.zip
 *.ova
-.env
-.envrc
-*kubeconfig*
-# vscode-sops
-.decrypted~*.yaml
-
-ansible/collections/
-ansible/facts_cache/
-modules/terraform-vsphere/
-archive/
-
 # main.tf  # allowing because all secrets are in .envrc
 govcvars.sh
-hosts.ini
+modules/terraform-vsphere/
 
-# os stuff
-.DS_Store
+# ansible
+ansible/collections/
+ansible/facts_cache/
+
+# temp / working files & dirs
+*.bak
+.temp*
+.todo*
+**/*archive/
+**/*wip/
+.private/
+.logs/
+.task/
+report/
+
+#extras
+*pytest*
+*cache*
+
+# retain files
+!**.gitkeep
+!*.sops.*

@@ -4,7 +4,7 @@ all:
     # ansible_pass: "{{ lookup('env', 'default_pass') }}"
     # ansible_become_pass: "{{ lookup('env', 'default_pass') }}"
     ansible_ssh_port: 22
-    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"
+    ansible_ssh_common_args: -o StrictHostKeyChecking=no
 
   children:
     kubernetes:
@@ -35,13 +35,13 @@ all:
     infra:
       hosts:
         opnsense:
-          # ansible_host: 10.0.0.1
-          # ansible_user: admin
+        # ansible_host: 10.0.0.1
+        # ansible_user: admin
         truenas:
-          # ansible_host: 10.2.1.1
-          # ansible_user: admin
-          # pxe_path: "/mnt/ssdpool/pxeboot/"
-        # github_runner:
-        #   ansible_host: 10.2.1.11
-        #   ansible_user: nrl
+    # ansible_host: 10.2.1.1
+    # ansible_user: admin
+    # pxe_path: "/mnt/ssdpool/pxeboot/"
+    # github_runner:
+    #   ansible_host: 10.2.1.11
+    #   ansible_user: nrl
     other:
