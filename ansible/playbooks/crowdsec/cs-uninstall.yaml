@@ -1,0 +1,102 @@
+---
+### NOTES
+# * Assumes lapi and agent are installed on each machine (equivalent to fail2ban config)
+# * this can (theoretically) be run in conjunction with crowdsec monitoring k8s virtual infra
+### REFERENCE
+# https://github.com/alf149/ansible-role-crowdsec
+# https://github.com/VeselaHouba/ansible-role-crowdsec
+
+- hosts: crowdsec_agents
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  vars:
+    cs_config_file_base: /etc/crowdsec
+    cs_install_dir_agent: /usr/local/bin
+    cs_install_dir_bouncer: /usr/local/bin
+
+    cs_bouncers:
+      - crowdsec-firewall-bouncer-nftables
+      # - crowdsec-firewall-bouncer-iptables
+
+  pre_tasks:
+    - name: Verify
+      pause:
+        prompt: This will uninstall crowdsec from all _agent_ hosts.  Please confirm (yes/no)
+      register: confirm_uninstall
+    - name: Confirm
+      delegate_to: localhost
+      run_once: true
+      assert:
+        that: confirm_uninstall.user_input | bool
+        fail_msg: "Exiting at user request ..."
+        success_msg: "Continuing with uninstall ..."
+    - name: Wait for availability
+      wait_for_connection:
+        delay: 10
+        timeout: 300
+
+  tasks:
+    - name: Stop crowdsec (agent)
+      block:
+        - name: Stop crowdsec service
+          systemd:
+            name: crowdsec
+            daemon_reload: true
+            state: stopped
+        - name: Stop crowdsec-firewall-bouncer service
+          systemd:
+            name: crowdsec-firewall-bouncer
+            state: stopped
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Uninstall crowdsec packages
+      ansible.builtin.apt:
+        name: crowdsec
+        state: absent
+        autoclean: true
+        autoremove: true
+        purge: true
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Uninstall bouncers
+      ansible.builtin.apt:
+        name: "{{ cs_bouncers | default([]) }}"
+        state: absent
+        autoclean: true
+        autoremove: true
+        purge: true
+      when:
+        - "'crowdsec_agents' in group_names"
+        - cs_bouncers | length > 0
+
+    - name: Remove agent (lapi)
+      delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
+      command: "cscli machines remove {{ inventory_hostname }}"
+      # ignore_errors: true
+      when:
+        # - cs_multiserver
+        - "'crowdsec_agents' in group_names"
+
+    - name: Remove bouncer
+      delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
+      command: "cscli bouncer remove {{ inventory_hostname }}-{{ item }}"
+      loop: "{{ cs_bouncers }}"
+      # ignore_errors: true
+      when:
+        # - cs_multiserver
+        - "'crowdsec_agents' in group_names"
+
+    - name: Clean up config directory
+      file:
+        path: "{{ cs_config_file_base }}"
+        state: absent
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Restart crowdsec (LAPI)
+      shell: /usr/local/etc/rc.d/crowdsec restart
+      when:
+        - "'crowdsec_lapi_server' in group_names"

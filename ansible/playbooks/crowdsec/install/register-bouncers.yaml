@@ -1,0 +1,40 @@
+---
+- name: "Register bouncer with LAPI"
+  block:
+    - name: Check if bouncer is already registered
+      delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
+      ansible.builtin.shell:
+        "cscli bouncers list -o raw | grep {{ inventory_hostname }}-{{ item }} || echo 'Not found'"
+      register: _csbouncers
+      changed_when: false
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Register bouncer to lapi
+      block:
+        - name: Register bouncer
+          delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
+          ansible.builtin.command: "cscli bouncer add {{ inventory_hostname }}-{{ item }} -o raw"
+          register: _csbouncer_key
+
+        - name: Update firewall bouncer api_key
+          ansible.builtin.replace:
+            path:
+              "/etc/crowdsec/bouncers/{{ item | regex_replace('^crowdsec-firewall-bouncer-nftables$',
+              'crowdsec-firewall-bouncer')}}.yaml"
+            regexp: "api_key: [a-zA-Z0-9]*"
+            replace: "api_key: {{ _csbouncer_key.stdout }}"
+            backup: true
+        - name: Update firewall bouncer api_uri
+          ansible.builtin.replace:
+            path:
+              "/etc/crowdsec/bouncers/{{ item | regex_replace('^crowdsec-firewall-bouncer-nftables$',
+              'crowdsec-firewall-bouncer')}}.yaml"
+            regexp: "api_url: 127.0.0.1:8080"
+            replace: "api_url: {{ cs_delegate_server_listen_uri }}"
+            backup: true
+      when:
+        - cs_multiserver
+        - "'crowdsec_agents' in group_names"
+        - _csbouncers.rc == 0
+        - _csbouncers.stdout is search("Not found")

@@ -11,7 +11,7 @@ MD007:
 # MD013/line-length - Line length
 MD013:
   # Number of characters
-  line_length: 119
+  line_length: 240
   # Number of characters for headings
   heading_line_length: 119
   # Number of characters for code blocks
@@ -28,3 +28,7 @@ MD013:
   strict: false
   # Stern length checking
   stern: false
+
+MD024:
+  # Allow heading duplication if under different parent headings
+  siblings_only: true

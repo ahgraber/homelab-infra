@@ -1,0 +1,91 @@
+---
+- hosts:
+    - localhost
+  gather_facts: false
+
+  tasks:
+    # - debug: # "{{ item['inventory_hostname']['mac'] }}"
+    #    var: "mac - str{{ hostvars[item]['mac'] }}" #54:b2:03:70:8b:6c
+    #   with_items:
+    #     "{{ groups['nodes'] }}"
+    # - debug: # "{{ item['inventory_hostname']['mac'] }}"
+    #     var: "ipaddr - {{ hostvars[item]['ansible_host'] }}" # 10.2.118.10
+    #   with_items:
+    #     "{{ groups['nodes'] }}"
+    # - debug:
+    #     var: "hostname - {{ hostvars[item]['inventory_hostname'] }}"
+    #   with_items:
+    #     "{{ groups['nodes'] }}"
+
+    - debug: # "{{ item['inventory_hostname']['mac'] }}"
+        var: "{{ hostvars[item]['ansible_host'] }}"
+      with_items:
+        # return [host: {key1: value1, k2: value2, ...}]
+        "{{ groups['nodes'] | default([]) }}"
+      when: hostvars[item]
+
+    # ### this works, but creates duplicate entries
+    # - name: dhcpd static map
+    #   delegate_to: localhost
+    #   xml:
+    #     # path: "{{ local_config_path }}"
+    #     path: "{{ playbook_dir }}/config.xml"
+    #     xpath: /opnsense/dhcpd/opt2 #{{ interface }}
+    #     input_type: xml
+    #     pretty_print: true
+    #     add_children: |
+    #       <staticmap>
+    #         <mac>{{ hostvars[item]['mac'] }}</mac>
+    #         <ipaddr>{{ hostvars[item]['ansible_host'] }}</ipaddr>
+    #         <hostname>{{ hostvars[item]['inventory_hostname_short'] }}</hostname>
+    #         <winsserver/>
+    #         <dnsserver/>
+    #         <ntpserver/>
+    #       </staticmap>
+    #   with_items:
+    #     "{{ groups['nodes'] }}"
+
+    # #################################################
+    # ### adjust xml static map one attribute per task
+    # #################################################
+
+    # # mac address is defined by default during the match
+    # - name: dhcpd static map - ip address
+    #   delegate_to: localhost
+    #   xml:
+    #     # path: "{{ local_config_path }}"
+    #     path: "{{ playbook_dir }}/config.xml"
+    #     # parse xml location by mac address
+    #     xpath: /opnsense/dhcpd/opt2/staticmap[mac/text()="{{ hostvars[item]['mac'] }}"]/ipaddr
+    #     value: "{{ hostvars[item]['ansible_host'] }}"
+    #     pretty_print: true
+    #   with_items:
+    #     "{{ groups['nodes'] | default([]) }}"
+    # - name: dhcpd static map - hostname
+    #   delegate_to: localhost
+    #   xml:
+    #     # path: "{{ local_config_path }}"
+    #     path: "{{ playbook_dir }}/config.xml"
+    #     # parse xml location by mac address
+    #     xpath: /opnsense/dhcpd/opt2/staticmap[mac/text()="{{ hostvars[item]['mac'] }}"]/hostname
+    #     value: "{{ hostvars[item]['inventory_hostname_short'] }}"
+    #     pretty_print: true
+    #   with_items:
+    #     "{{ groups['nodes'] | default([]) }}"
+
+    # ### combined static map
+    # - name: dhcpd static map
+    #   delegate_to: localhost
+    #   xml:
+    #     # path: "{{ local_config_path }}"
+    #     path: "{{ playbook_dir }}/config.xml"
+    #     # parse xml location by mac address
+    #     xpath: /opnsense/dhcpd/opt2/staticmap[mac/text()="{{ hostvars[item]['mac'] }}"]/{{ item.1.key }}
+    #     value: {{ hostvars[item]['mac'] }}
+    #         <mac>{{ hostvars[item]['mac'] }}</mac>
+    #         <ipaddr>{{ hostvars[item]['ansible_host'] }}</ipaddr>
+    #         <hostname>{{ hostvars[item]['inventory_hostname_short'] }}</hostname>
+    #     pretty_print: true
+    #   with_items:
+    #     # return [host: {key1: value1, k2: value2, ...}]
+    #     "{{ groups['nodes'] | default([]) }}"

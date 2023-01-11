@@ -1,0 +1,148 @@
+---
+- hosts:
+    - ubuntu
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Pausing for 5 seconds...
+      pause:
+        seconds: 5
+    - name: Wait for availability
+      wait_for_connection:
+        delay: 0
+        timeout: 300
+
+  tasks:
+    - name: Locale
+      tags: [networking, setup]
+      block:
+        - name: Locale | Set timezone
+          community.general.timezone:
+            name: "{{ timezone | default('Etc/UTC') }}"
+
+    - name: Networking
+      tags: [networking, setup]
+      block:
+        - name: Networking | Set hostname to inventory hostname
+          ansible.builtin.hostname:
+            name: "{{ inventory_hostname }}"
+        - name: Networking | Update /etc/hosts to include inventory hostname
+          ansible.builtin.blockinfile:
+            path: /etc/hosts
+            block: |
+              127.0.1.1   {{ inventory_hostname }}
+
+    - name: Packages | Ubuntu
+      tags: [packages, setup]
+      block:
+        - name: Packages | Install required packages
+          ansible.builtin.apt:
+            name: "{{ packages | default([]) }}"
+            state: present
+            update_cache: true
+        - name: Add eternal terminal repository
+          ansible.builtin.apt_repository:
+            repo: ppa:jgmath2000/et
+        - name: Install custom packages
+          ansible.builtin.apt:
+            name: et
+            state: present
+            update_cache: true
+        - name: Packages | Remove leaf packages
+          ansible.builtin.apt:
+            autoremove: true
+        # - name: Remove packages
+        #   ansible.builtin.apt:
+        #     name: "{{ packages_remove }}"
+        #     state: absent
+        #     autoremove: true
+        # - name: Remove cloud-init files
+        #   ansible.builtin.file:
+        #     state: absent
+        #     path: "{{ item }}"
+        #   loop:
+        #     - "/etc/cloud"
+        #     - "/var/lib/cloud"
+        #   when:
+        #     - "'cloud-init' in apt_remove_packages"
+        # - name: Remove snapd files
+        #   ansible.builtin.file:
+        #     state: absent
+        #     path: "{{ item }}"
+        #   loop:
+        #     - "/home/{{ ansible_user }}/.snap"
+        #     - "/snap"
+        #     - "/var/snap"
+        #     - "/var/lib/snapd"
+        #     - "/var/cache/snapd"
+        #     - "/usr/lib/snapd"
+        #   when:
+        #     - "'snapd' in apt_remove_packages"
+
+    - name: User Configuration
+      tags: [user, setup]
+      block:
+        - name: User Configuration | Add additional SSH public keys
+          ansible.posix.authorized_key:
+            user: "{{ ansible_user }}"
+            key: "{{ item }}"
+          # loop: "{{ ssh_authorized_keys | default([]) }}" # from group_var
+          loop:
+            - "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
+            - "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_ed25519.pub') }}"
+        - name: User Configuration | Add user to sudoers
+          ansible.builtin.copy:
+            content: |
+              {{ ansible_user }} ALL=(ALL:ALL) NOPASSWD:ALL
+            dest: /etc/sudoers.d/{{ ansible_user }}_nopasswd
+            mode: 0440
+
+    - name: System Configuration
+      tags: [system, setup]
+      block:
+        - name: Disable swap at runtime
+          ansible.builtin.command: swapoff -a
+          when:
+            - ansible_swaptotal_mb > 0
+        - name: Disable swap at boot
+          ansible.posix.mount:
+            name: "{{ item }}"
+            fstype: swap
+            state: absent
+          loop: ["none", "swap"]
+
+        - name: network ups tools
+          when: "'metal' in {{ group_names }}"
+          block:
+            - name: Force systemd to reload itself
+              systemd:
+                daemon_reload: true
+            - name: configure upsmon.conf
+              ansible.builtin.template:
+                src: nut/upsmon.conf.j2
+                dest: "{{ nut_config_path }}/upsmon.conf"
+                owner: root
+                group: "{{ nut_user }}"
+                mode: 0640
+              register: upsmon_conf_result
+            - name: configure nut.conf
+              ansible.builtin.template:
+                dest: "{{ nut_config_path }}/nut.conf"
+                src: nut/nut.conf.j2
+                owner: root
+                group: "{{ nut_user }}"
+                mode: 0640
+              register: nut_conf_result
+            - name: ensure nut services running & enabled
+              service:
+                name: "{{ item }}"
+                state: restarted
+                enabled: true
+              with_items:
+                - nut-client
+                # - nut-driver
+                # - nut-server
+
+    - name: reboot
+      reboot:

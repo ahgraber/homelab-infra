@@ -1,0 +1,6 @@
+name: local_whitelist
+description: "Whitelist events from my ip addresses"
+whitelist:
+  reason: "my ip ranges"
+  ip: {{ cs_whitelist_ip|to_yaml }}
+  cidr: {{ cs_whitelist_cidr|to_yaml }}

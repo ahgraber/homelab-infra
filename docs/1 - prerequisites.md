@@ -7,7 +7,7 @@ A global prerequisite is the existence of a VMWare vSphere ESXi host/cluster man
 It is advisable to install [direnv](https://github.com/direnv/direnv) to persist
 environmental variables to a hidden `.envrc` file.
 
-After direnv is installed, set up on the local repo path:
+After direnv is installed, set up on the local repository path:
 
 ```sh
 # add direnv hooks
@@ -75,7 +75,7 @@ govc find -type s
 2. Update Ansible requirements
 
    ```sh
-   ansible-galaxy install -r ./ansible/requirements.yml --force
+   ansible-galaxy install -r ./ansible/requirements.yaml --force
    ```
 
 3. Update python requirements

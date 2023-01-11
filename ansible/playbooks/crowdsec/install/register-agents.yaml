@@ -1,0 +1,55 @@
+---
+- name: Configure multiserver LAPI delegation
+  block:
+    - name: Configure agent for delegation
+      block:
+        # - name: Crowdsec - local_api_credentials.yaml template for lapi server
+        #   template:
+        #     src: cs_local_api_credentials.j2
+        #     dest:  /etc/crowdsec/local_api_credentials.yaml
+        #     owner: root
+        #     group: root
+        #     mode: 0644
+        - name: Set agent service with -no-api flag
+          ansible.builtin.replace:
+            path: "/lib/systemd/system/crowdsec.service"
+            regexp: "^ExecStart=/usr/bin/crowdsec -c /etc/crowdsec/config.yaml$"
+            replace: "ExecStart=/usr/bin/crowdsec -c /etc/crowdsec/config.yaml -no-api"
+            backup: true
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Check if agent is already registered
+      delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
+      ansible.builtin.shell: "cscli machines list -o raw | grep {{ inventory_hostname }} || echo 'Not found'"
+      register: _csmachines_registered
+      changed_when: false
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Register agent to LAPI
+      ansible.builtin.command:
+        "cscli lapi register --url http://{{ cs_delegate_server_listen_uri }} --machine {{ inventory_hostname }}"
+      when:
+        - cs_multiserver
+        - "'crowdsec_agents' in group_names"
+        - _csmachines_registered.rc == 0
+        - _csmachines_registered.stdout is search("Not found")
+
+    - name: Check if agent is already validated
+      delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
+      ansible.builtin.shell:
+        "cscli machines list -o raw | grep {{ inventory_hostname }} | grep true || echo 'Not found'"
+      register: _csmachines_valid
+      changed_when: false
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Validate agent (lapi)
+      delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
+      ansible.builtin.command: "cscli machines validate {{ inventory_hostname }}"
+      when:
+        - cs_multiserver
+        - "'crowdsec_agents' in group_names"
+        - _csmachines_valid.rc == 0
+        - _csmachines_valid.stdout is search("Not found")

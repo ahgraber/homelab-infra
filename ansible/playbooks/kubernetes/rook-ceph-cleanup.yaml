@@ -1,0 +1,119 @@
+---
+- hosts:
+    # - controller
+    - localhost
+    - worker
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Verify
+      pause:
+        prompt: |
+          Preparing to remove rook-ceph files local to nodes.
+          This will destroy all data!
+          Prior to this, confirm you have removed rook-ceph from the k8s cluster gitops.
+          Please confirm (yes/no)
+      register: confirm_remove
+
+    - name: Confirm
+      delegate_to: localhost
+      run_once: true
+      assert:
+        that: confirm_remove.user_input | bool
+        fail_msg: "Exiting at user request ..."
+        success_msg: "Continuing with cleanup ..."
+
+  tasks:
+    # - name: Patch cephcluster
+    #   become: true
+    #   delegate_to: localhost
+    #   # kubectl patch cephcluster rook-ceph -n rook-ceph --type merge -p '{"spec":{"cleanupPolicy":{"confirmation":"yes-really-destroy-data"}}}'
+    #   kubernetes.core.k8s_json_patch:
+    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
+    #     kind: cephcluster
+    #     name: rook-ceph
+    #     namespace: rook-ceph
+    #     patch:
+    #       - op: merge
+    #         path: /spec/cleanupPolicy/confirmation
+    #         value: "yes-really-destroy-data"
+
+    # - name: Delete cluster helmrelease
+    #   become: true
+    #   delegate_to: localhost
+    #   # kubectl delete hr rook-ceph-cluster -n rook-ceph
+    #   kubernetes.core.k8s:
+    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
+    #     state: absent
+    #     kind: helmrelease
+    #     name: rook-ceph
+    #     namespace: rook-ceph
+
+    # - name: Delete cephcluster
+    #   become: true
+    #   delegate_to: localhost
+    #   # kubectl delete hr rook-ceph-cluster -n rook-ceph
+    #   kubernetes.core.k8s:
+    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
+    #     state: absent
+    #     kind: cephcluster
+    #     name: rook-ceph
+    #     namespace: rook-ceph
+
+    # - name: Delete operator helmrelease
+    #   become: true
+    #   delegate_to: localhost
+    #   # kubectl delete hr rook-ceph-cluster -n rook-ceph
+    #   kubernetes.core.k8s:
+    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
+    #     state: absent
+    #     kind: helmrelease
+    #     name: rook-ceph-operator
+    #     namespace: rook-ceph
+
+    # - name: Delete namespace
+    #   become: true
+    #   delegate_to: localhost
+    #   # kubectl delete hr rook-ceph-cluster -n rook-ceph
+    #   kubernetes.core.k8s:
+    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
+    #     state: absent
+    #     kind: namespace
+    #     name: rook-ceph
+
+    ### TODO: delete CRDs?
+
+    # assumes removal of cluster from k8s
+    - name: Delete rook files
+      become: true
+      ansible.builtin.file:
+        path: "/var/lib/rook/"
+        state: absent
+
+    - name: Format drives
+      become: true
+      ansible.builtin.shell: |
+        #!/usr/bin/env bash
+        DISK="/dev/sda"
+
+        # Zap the disk to a fresh, usable state (zap-all is important, b/c MBR has to be clean)
+        # You will have to run this step for all disks.
+        sgdisk --zap-all $DISK
+
+        # Clean hdds with dd
+        dd if=/dev/zero of="$DISK" bs=1M count=100 oflag=direct,dsync
+
+        # Clean disks such as ssd with blkdiscard instead of dd
+        blkdiscard $DISK
+
+        # These steps only have to be run once on each node
+        # If rook sets up osds using ceph-volume, teardown leaves some devices mapped that lock the disks.
+        ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %
+
+        # ceph-volume setup can leave ceph-<UUID> directories in /dev and /dev/mapper (unnecessary clutter)
+        rm -rf /dev/ceph-*
+        rm -rf /dev/mapper/ceph--*
+
+        # Inform the OS of partition table changes
+        partprobe $DISK

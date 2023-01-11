@@ -1,0 +1,21 @@
+
+cs_token: ${crowdsec_webconsole_token}
+
+# cs_lapi_pass: ${crowdsec_lapi_pass}
+cs_delegate_server_listen_uri: 10.2.0.1:8080 # only if cs_multiserver is true
+
+cs_whitelist_ip:
+  - "127.0.0.1"
+  - "::1"
+  - "10.1.0.100"
+  - "10.1.0.101"
+  - "10.1.0.102"
+  - "10.1.0.103"
+  - "10.1.0.104"
+  - "10.11.12.13"
+  - "10.11.12.14"
+  - "10.11.12.15"
+cs_whitelist_cidr:
+  - 10.0.0.0/8
+  # - 172.16.0.0/12
+  - 192.168.0.0/24

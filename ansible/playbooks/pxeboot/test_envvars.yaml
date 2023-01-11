@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: true
+
+  tasks:
+    - name: Set facts from .envrc
+      set_fact:
+        # envrc: "envrc['{{ item }}']: {{ lookup('env', '{{ item }}')"
+        # envrc: "{{ envrc['{{ item }}'] }}: '{{ item }}'"
+        "{{item}}": "{{ lookup('env', '{{ item }}') }}"
+      with_items:
+        # - 'a'
+        # - 'b'
+        # - 'c'
+        - ssh_rsa
+        - ssh_ed25519
+        - domain
+        - gateway
+        - user
+        - default_pass
+        - crypted_pass
+        - email
+      # vars:
+      #   envrc: {}
+
+    - debug:
+        var: "{{item}}"
+      with_items:
+        # - 'a'
+        # - 'b'
+        # - 'c'
+        - ssh_rsa
+        - ssh_ed25519
+        - domain
+        - gateway
+        - user
+        - default_pass
+        - crypted_pass
+        - email
+
+    - debug:
+        var: "{{item}}"
+      with_items:
+        - ansible_default_ipv4.address
+        - ansible_default_ipv4.broadcast
+        - ansible_default_ipv4.gateway
+        - ansible_default_ipv4.netmask
+        - ansible_default_ipv4.network

@@ -1,0 +1,4 @@
+---
+ansible_host: 10.2.1.1
+ansible_user: admin
+pxe_path: "/mnt/ssdpool/pxeboot/"

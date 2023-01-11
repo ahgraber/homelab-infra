@@ -134,24 +134,28 @@ module "workers" {
 # create Ansible hosts file
 resource "local_file" "ansible_hosts" {
   depends_on = [module.controllers, module.workers]
-  content = templatefile("./templates/inventory.tmpl",
+    # content = templatefile("./templates/inventory.ini.tmpl",
+    content = templatefile("./templates/inventory.yaml.tmpl",
     {
       controller_hostnames    = module.controllers.VM,
       controller_ips          = module.controllers.ip,
       worker_hostnames        = module.workers.VM,
       worker_ips              = module.workers.ip,
-      node_user               = var.NODE_USER,
+      # node_user               = var.NODE_USER,
       kube_vip                = var.KUBE_VIP
-      cluster_domain          = var.DOMAIN
-      kubernetes_oidc_issuer  = var.KUBERNETES_OIDC_ISSUER
-      kubernetes_oidc_clientid= var.KUBERNETES_OIDC_CLUSTERID
+      kube_vip_iface          = var.KUBE_VIP_IFACE
+      # cluster_domain          = var.DOMAIN
+      # kubernetes_oidc_issuer  = var.KUBERNETES_OIDC_ISSUER
+      # kubernetes_oidc_clientid        = var.KUBERNETES_OIDC_CLUSTERID
+      #kubernetes_oidc_username_claim  = var.KUBERNETES_OIDC_USERNAME_CLAIM
     }
   )
-  filename = "./ansible/inventory/cluster/host.ini"
+  # filename = "./ansible/inventory/cluster/host.ini"
+  filename = "./ansible/inventory/cluster/hosts-terraform.yaml"
 }
 
 
-# provision k3s with ansible
+# update vms with ansible
 resource "null_resource" "null" {
   # depends_on = [module.controllers, module.workers, local_file.ansible_hosts]
   depends_on = [local_file.ansible_hosts]
@@ -162,11 +166,23 @@ resource "null_resource" "null" {
         # update ubuntu
         ansible-playbook -i ${var.ANSIBLE_HOSTS_FILE} ${var.ANSIBLE_PLAYBOOK_DIR}/ubuntu/ubuntu-prepare.yml
         ansible-playbook -i ${var.ANSIBLE_HOSTS_FILE} ${var.ANSIBLE_PLAYBOOK_DIR}/ubuntu/ubuntu-upgrade.yml
-
-        # install k3s
-        ansible-playbook -i ${var.ANSIBLE_HOSTS_FILE} ${var.ANSIBLE_PLAYBOOK_DIR}/kubernetes/k3s-install.yml
-        cp -f /tmp/kubeconfig ./kubeconfig
         EOF
       environment = {}
   }
 }
+
+# # provision k3s with ansible
+# resource "null_resource" "null" {
+#   # depends_on = [module.controllers, module.workers, local_file.ansible_hosts]
+#   depends_on = [local_file.ansible_hosts]
+#   provisioner "local-exec" {
+#       command = <<EOF
+#         sleep 15
+
+#         # install k3s
+#         ansible-playbook -i ${var.ANSIBLE_HOSTS_FILE} ${var.ANSIBLE_PLAYBOOK_DIR}/kubernetes/k3s-install.yml
+#         cp -f /tmp/kubeconfig ./kubeconfig
+#         EOF
+#       environment = {}
+#   }
+# }
