@@ -1,7 +1,6 @@
 ---
 - hosts:
-    # - controller
-    - localhost
+    - controller
     - worker
   become: true
   gather_facts: true
@@ -25,95 +24,25 @@
         success_msg: Continuing with cleanup ...
 
   tasks:
-    # - name: Patch cephcluster
-    #   become: true
-    #   delegate_to: localhost
-    #   # kubectl patch cephcluster rook-ceph -n rook-ceph --type merge -p '{"spec":{"cleanupPolicy":{"confirmation":"yes-really-destroy-data"}}}'
-    #   kubernetes.core.k8s_json_patch:
-    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
-    #     kind: cephcluster
-    #     name: rook-ceph
-    #     namespace: rook-ceph
-    #     patch:
-    #       - op: merge
-    #         path: /spec/cleanupPolicy/confirmation
-    #         value: "yes-really-destroy-data"
-
-    # - name: Delete cluster helmrelease
-    #   become: true
-    #   delegate_to: localhost
-    #   # kubectl delete hr rook-ceph-cluster -n rook-ceph
-    #   kubernetes.core.k8s:
-    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
-    #     state: absent
-    #     kind: helmrelease
-    #     name: rook-ceph
-    #     namespace: rook-ceph
-
-    # - name: Delete cephcluster
-    #   become: true
-    #   delegate_to: localhost
-    #   # kubectl delete hr rook-ceph-cluster -n rook-ceph
-    #   kubernetes.core.k8s:
-    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
-    #     state: absent
-    #     kind: cephcluster
-    #     name: rook-ceph
-    #     namespace: rook-ceph
-
-    # - name: Delete operator helmrelease
-    #   become: true
-    #   delegate_to: localhost
-    #   # kubectl delete hr rook-ceph-cluster -n rook-ceph
-    #   kubernetes.core.k8s:
-    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
-    #     state: absent
-    #     kind: helmrelease
-    #     name: rook-ceph-operator
-    #     namespace: rook-ceph
-
-    # - name: Delete namespace
-    #   become: true
-    #   delegate_to: localhost
-    #   # kubectl delete hr rook-ceph-cluster -n rook-ceph
-    #   kubernetes.core.k8s:
-    #     kubeconfig: "{{ playbook_dir }}/../../../kubeconfig"
-    #     state: absent
-    #     kind: namespace
-    #     name: rook-ceph
-
-    ### TODO: delete CRDs?
-
     # assumes removal of cluster from k8s
-    - name: Delete rook files
-      become: true
+    - name: Remove /var/lib/rook
       ansible.builtin.file:
-        path: /var/lib/rook/
         state: absent
+        path: /var/lib/rook
 
-    - name: Format drives
-      become: true
-      ansible.builtin.shell: |
-        #!/usr/bin/env bash
-        DISK="/dev/sda"
-
-        # Zap the disk to a fresh, usable state (zap-all is important, b/c MBR has to be clean)
-        # You will have to run this step for all disks.
-        sgdisk --zap-all $DISK
-
-        # Clean hdds with dd
-        dd if=/dev/zero of="$DISK" bs=1M count=100 oflag=direct,dsync
-
-        # Clean disks such as ssd with blkdiscard instead of dd
-        blkdiscard $DISK
-
-        # These steps only have to be run once on each node
-        # If rook sets up osds using ceph-volume, teardown leaves some devices mapped that lock the disks.
-        ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %
-
-        # ceph-volume setup can leave ceph-<UUID> directories in /dev and /dev/mapper (unnecessary clutter)
-        rm -rf /dev/ceph-*
-        rm -rf /dev/mapper/ceph--*
-
-        # Inform the OS of partition table changes
-        partprobe $DISK
+    - name: Zap the disk to a fresh, usable state (zap-all is important, b/c MBR has to be clean)
+      ansible.builtin.command: sgdisk --zap-all "{{ rook_block_device }}" || true
+    - name: Wipe a large portion of the beginning of the disk to remove more LVM metadata that may be present
+      ansible.builtin.command: dd if=/dev/zero of="{{ rook_block_device }}" bs=1M count=100 oflag=direct,dsync
+    - name: Wipe the block device with wipefs
+      ansible.builtin.command: wipefs --all --force "{{ rook_block_device }}"
+    - name: SSDs may be better cleaned with blkdiscard instead of dd
+      ansible.builtin.command: blkdiscard "{{ rook_block_device }}"
+    - name: Inform the OS of partition table changes
+      ansible.builtin.command: partprobe "{{ rook_block_device }}"
+    - name: Ceph can leave LVM and device mapper data that can lock the disks
+      ansible.builtin.command: "{{ item }}"
+      loop:
+        - ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %
+        - rm -rf /dev/ceph-*
+        - rm -rf /dev/mapper/ceph--*

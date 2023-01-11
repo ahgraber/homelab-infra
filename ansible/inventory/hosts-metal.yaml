@@ -28,16 +28,19 @@ metal:
           mac: 08:92:04:d8:09:55
           disk: nvme0n1
           network_interface: enp2s0
-          storage: /dev/sda
+          # storage: /dev/sda
+          rook_block_device: "/dev/disk/by-id/ata-SATA_SSD_22010312000052"
         optiplex4:
           ansible_host: 10.2.118.27
           mac: 08:92:04:d8:07:46
           disk: nvme0n1
           network_interface: enp2s0
-          storage: /dev/sda
+          # storage: /dev/sda
+          rook_block_device: "/dev/disk/by-id/ata-SATA_SSD_22010312000015"
         optiplex5:
           ansible_host: 10.2.118.28
           mac: ""
           disk: nvme0n1
           network_interface: enp2s0
-          storage: /dev/sda
+          # storage: /dev/sda
+          rook_block_device: "/dev/disk/by-id/ata-SATA_SSD_22010312000028"
