@@ -83,6 +83,10 @@ repos:
     rev: v6.10.2
     hooks:
       - id: ansible-lint
+        args:
+          - --config-file=.ansible-lint
+          - --project-dir=ansible/
+          - --parseable
   - repo: https://github.com/k8s-at-home/sops-pre-commit
     rev: v2.1.1
     hooks:

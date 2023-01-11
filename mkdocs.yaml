@@ -1,0 +1,86 @@
+---
+# Project information
+site_name: ahgraber | Homelab Infra
+site_description: Homelab infrastructure management with terraform and ansible
+site_author: Alex Graber
+site_url: https://ahgraber.github.io/homelab-infra/
+
+# Repository
+repo_name: ahgraber/homelab-gitops-k3s
+repo_url: https://github.com/ahgraber/homelab-infra
+edit_uri: "edit/main/docs/"
+
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github-alt
+  language: en
+  features:
+    - navigation.sections
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+  palette:
+    - scheme: default
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+docs_dir: ./docs
+
+# # Customization
+# extra_css:
+#   - _static/custom.css
+
+# extra:
+#   social:
+#     - icon: fontawesome/brands/github
+#       link: https://github.com/ahgraber
+
+# Plugins
+plugins:
+  - search:
+      lang: en
+  - minify:
+      minify_html: true
+#   - macros:
+#       include_dir: docs/_snippets
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - attr_list
+  - toc:
+      permalink: true
+  # prettier-ignore
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+# Navigation structure
+nav:
+  - Introduction: index.md # formerly hardlinked to README.md
+  - Installation:
+      - Prerequisites: ./1-prerequisites.md
+      - Terraform: ./2-terraform.md
+      - PXE: ./pxe.md
+      - Ansible: ./3-ansible.md
+  - Infra:
+      - TrueNAS: ./truenas.md
+      - UPS: ./ups.md
+  - Notes:
+      - Crowdsec: ./notes/crowdsec.md
+      - Format and Mount Drives: ./notes/format_and_mount.md
+      - Bootable Ubuntu USB: ./notes/ubuntu_usb.md
