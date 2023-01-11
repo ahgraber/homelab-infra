@@ -72,6 +72,24 @@
         - "'crowdsec_agents' in group_names"
         - cs_bouncers | length > 0
 
+    - name: Remove crowdsec key
+      ansible.builtin.apt_key:
+        url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
+        state: absent
+        keyring: /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
+
+    - name: Remove crowdsec apt repository
+      ansible.builtin.apt_repository:
+        repo: deb https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+        state: absent
+        filename: crowdsec
+    - name: Remove crowdsec src repository
+      ansible.builtin.apt_repository:
+        repo: deb-src https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+        state: absent
+        filename: crowdsec-src
+        update_cache: true
+
     - name: Remove agent (lapi)
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
       command: cscli machines remove {{ inventory_hostname }}
