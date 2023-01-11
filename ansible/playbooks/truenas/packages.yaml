@@ -42,7 +42,9 @@
       delegate_to: localhost
       get_url:
         # url: "{{ item.stdout }}"
-        url: "https://github.com/{{ item.item.user }}/{{ item.item.repo }}/releases/download/{{ item.tag }}/{{ item.item.repo }}_{{ item.tag | regex_replace('^v', '') }}_linux_amd64.bz2"
+        url:
+          "https://github.com/{{ item.item.user }}/{{ item.item.repo }}/releases/download/{{ item.tag }}/{{
+          item.item.repo }}_{{ item.tag | regex_replace('^v', '') }}_linux_amd64.bz2"
         dest: "{{ playbook_dir }}/{{ item.item.repo }}.bz2"
       loop: "{{ latest.results }}"
 
@@ -56,9 +58,9 @@
     - name: Copy to remote
       copy:
         src: "{{ playbook_dir }}/{{ item.item.repo }}"
-        remote_src: no
+        remote_src: false
         dest: /usr/local/bin
-        force: yes
+        force: true
         mode: "0755"
       loop: "{{ latest.results }}"
 

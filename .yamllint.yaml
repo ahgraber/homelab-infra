@@ -2,6 +2,7 @@
 ignore: |
   .vscode/
   *.sops.*
+  gotk-components.yaml
 extends: default
 rules:
   braces:
@@ -11,8 +12,8 @@ rules:
     min-spaces-inside: 0
     max-spaces-inside: 0
   comments:
-    min-spaces-from-content: 1
-  comments-indentation: false
+    min-spaces-from-content: 1 # align w prettier
+  comments-indentation: disable
   indentation:
     spaces: consistent
     indent-sequences: consistent

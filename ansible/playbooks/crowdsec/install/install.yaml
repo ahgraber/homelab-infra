@@ -21,12 +21,12 @@
             repo: deb-src https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
             state: present
             filename: crowdsec-src
-            update_cache: yes
+            update_cache: true
         - name: Install crowdsec packages
           ansible.builtin.apt:
             name: crowdsec
             state: present
-            update_cache: yes
+            update_cache: true
         - name: crowdsec - cscli bash completion
           # ansible.builtin.shell: "cscli completion bash | sudo tee /etc/bash_completion.d/cscli"
           ansible.builtin.shell: "cscli completion bash | tee /etc/bash_completion.d/cscli"
@@ -43,39 +43,39 @@
 
     - name: Install collections
       # become: true
-      command: "cscli collections install {{ item }}"
+      ansible.builtin.command: "cscli collections install {{ item }}"
       with_items: "{{ cs_collections }}"
       when: cs_collections | length > 0
 
     - name: Install parsers
       # become: true
-      command: "cscli parsers install {{ item }}"
+      ansible.builtin.command: "cscli parsers install {{ item }}"
       with_items: "{{ cs_parsers }}"
       when: cs_parsers | length > 0
 
     - name: Install postoverflows
       # become: true
-      command: "cscli postoverflows install {{ item }}"
+      ansible.builtin.command: "cscli postoverflows install {{ item }}"
       with_items: "{{ cs_postoverflows }}"
       when: cs_postoverflows | length > 0
 
     - name: Install scenarios
       # become: true
-      command: "cscli scenarios install {{ item }}"
+      ansible.builtin.command: "cscli scenarios install {{ item }}"
       with_items: "{{ cs_scenarios }}"
       when: cs_scenarios | length > 0
 
     - name: Configure
       block:
         - name: Main config
-          template:
+          ansible.builtin.template:
             src: config.yaml.j2
             dest: "{{ cs_config_file_base }}/config.yaml"
             owner: root
             group: root
             mode: 0644
         - name: Set whitelist
-          template:
+          ansible.builtin.template:
             src: whitelist.yaml.j2
             dest: "{{ cs_config_file_base }}/parsers/s02-enrich/local-whitelist.yaml"
             owner: root
@@ -94,12 +94,12 @@
               labels:
                 type: journald"
               ---
-            backup: yes
+            backup: true
         - name: Flush handlers to apply config
           meta: flush_handlers
 
 - name: Enroll instance to web console
-  command: "cscli console enroll --name {{ inventory_hostname }} {{ cs_token }}"
+  ansible.builtin.command: "cscli console enroll --name {{ inventory_hostname }} {{ cs_token }}"
   when:
     - cs_token is defined
     - not cs_multiserver

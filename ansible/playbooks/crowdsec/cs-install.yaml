@@ -84,6 +84,6 @@
         - "'crowdsec_agents' in group_names"
 
     - name: Restart crowdsec (LAPI)
-      shell: /usr/local/etc/rc.d/crowdsec restart
+      ansible.builtin.shell: /usr/local/etc/rc.d/crowdsec restart
       when:
         - "'crowdsec_lapi_server' in group_names"

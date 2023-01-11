@@ -2,18 +2,19 @@
 fail_fast: false
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.4.0
     hooks:
-      - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: mixed-line-ending
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
   - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.1.13
+    rev: v1.3.1
     hooks:
       - id: remove-crlf
       - id: remove-tabs
   - repo: https://github.com/sirosen/texthooks
-    rev: 0.3.1
+    rev: 0.4.0
     hooks:
       - id: fix-smartquotes
       - id: fix-ligatures
@@ -34,35 +35,61 @@ repos:
       #   entry: .precommit/sops.sh
       #   language: script
       #   pass_filenames: false
+  ## shellcheck requires docker to run
+  # - repo: https://github.com/koalaman/shellcheck-precommit
+  #   rev: v0.8.0
+  #   hooks:
+  #     - id: shellcheck
+  #       args:
+  #         - --severity=warning
+  #         - -e
+  #         - SC1071
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v2.6.0 # Use the sha or tag you want to point at
+    rev: v3.0.0-alpha.4 # Use the sha or tag you want to point at
     hooks:
       - id: prettier
-        # args: ["--ignore-path '**/*.md'", "--ignore-path '**/*.y*ml'"]
+        args:
+          - --ignore-unknown
+          # - "--ignore-path '**/*.md'"
+          # - "--ignore-path '**/*.y*ml'"
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.31.1 # v0.30.0
+    rev: v0.33.0 # v0.30.0
     hooks:
       - id: markdownlint
-        args: [--fix, --config=.github/linters/.markdownlint.yaml]
+        args:
+          - --config=.markdownlint.yaml
+          - --fix
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.26.3
+    rev: v1.29.0
     hooks:
-      - args:
-          - --config-file
-          - .github/linters/.yamllint.yaml
-        id: yamllint
-  # - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-  #   rev: 0.1.0
+      - id: yamllint
+        args:
+          - --config-file=.yamllint.yaml
+          - --format=parsable
+          - --strict
+  # - repo: https://github.com/hadolint/hadolint.git
+  #   rev: v2.12.1-beta
   #   hooks:
-  #     - id: yamlfmt
-  #       args: [--mapping, '2', --sequence, '4', --offset, '2', --preserve-quotes]
+  #     - id: hadolint-docker
+  #       entry: hadolint/hadolint hadolint
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.8.0.4
+    hooks:
+      - id: shellcheck
+        args: ["-x"]
+        # ignore '*.zsh" scripts'
+        exclude: "^.*zsh$"
+  - repo: https://github.com/ansible/ansible-lint.git
+    rev: v6.10.2
+    hooks:
+      - id: ansible-lint
   - repo: https://github.com/k8s-at-home/sops-pre-commit
-    rev: v2.1.0
+    rev: v2.1.1
     hooks:
       - id: forbid-secrets
         args: [-h, "**/*.sops.yaml"]
         # note: this only checks specific files for secrets!
   - repo: https://github.com/zricethezav/gitleaks
-    rev: v8.5.1
+    rev: v8.15.2
     hooks:
       - id: gitleaks

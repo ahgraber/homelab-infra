@@ -1,17 +1,17 @@
 ---
 - name: Ensure hosting folder exists
   become: true
-  file:
-    path: "{{pxe_path}}"
+  ansible.builtin.file:
+    path: "{{ pxe_path }}"
     state: directory
     mode: "0777"
 
-- name: copy files to server (this may take a minute)
-  copy:
+- name: Copy files to server (this may take a minute)
+  ansible.builtin.copy:
     src: "{{ playbook_dir }}/data/files/"
-    dest: "{{pxe_path}}"
+    dest: "{{ pxe_path }}"
 
-- name: copy iso to server (this may take a minute)
-  copy:
+- name: Copy iso to server (this may take a minute)
+  ansible.builtin.copy:
     src: "{{ playbook_dir }}/data/iso/"
-    dest: "{{pxe_path}}/iso"
+    dest: "{{ pxe_path }}/iso"

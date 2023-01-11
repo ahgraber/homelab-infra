@@ -119,7 +119,7 @@
               systemd:
                 daemon_reload: true
             - name: configure upsmon.conf
-              template:
+              ansible.builtin.template:
                 src: nut/upsmon.conf.j2
                 dest: "{{ nut_config_path }}/upsmon.conf"
                 owner: root
@@ -127,7 +127,7 @@
                 mode: 0640
               register: upsmon_conf_result
             - name: configure nut.conf
-              template:
+              ansible.builtin.template:
                 dest: "{{ nut_config_path }}/nut.conf"
                 src: nut/nut.conf.j2
                 owner: root
@@ -138,7 +138,7 @@
               service:
                 name: "{{ item }}"
                 state: restarted
-                enabled: yes
+                enabled: true
               with_items:
                 - nut-client
                 # - nut-driver

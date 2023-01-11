@@ -1,6 +1,6 @@
 ---
 - name: Set facts from .envrc
-  set_fact:
+  ansible.builtin.set_fact:
     "{{item}}": "{{ lookup('env', '{{ item }}') }}"
   with_items:
     - ssh_rsa
@@ -33,7 +33,7 @@
 #   with_items: "{{envrc.results}}"
 
 - name: Ensure folder structure exists
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
   loop:
@@ -45,7 +45,7 @@
     - "{{ playbook_dir }}/data/os/"
 
 - name: Download ISO
-  get_url:
+  ansible.builtin.get_url:
     url: "{{ iso_url }}"
     # dest: "{{ playbook_dir }}/data/files/iso/{{ iso_url | basename }}"
     dest: "{{ playbook_dir }}/data/iso/{{ iso_url | basename }}"
@@ -54,13 +54,13 @@
 
 - name: Extract the ISO
   become: true
-  command:
+  ansible.builtin.command:
     cmd: "xorriso -osirrox on -indev {{ iso.dest }} -extract / {{ playbook_dir }}/data/os"
     creates: "{{ playbook_dir }}/data/os/.treeinfo"
 
 - name: Copy required files from extract
   delegate_to: localhost
-  copy:
+  ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
   loop:
@@ -69,7 +69,7 @@
 
 # ref: https://askubuntu.com/questions/1235723/automated-20-04-server-installation-using-pxe-and-live-server-image
 - name: Download signed grub netboot EFI
-  get_url:
+  ansible.builtin.get_url:
     url: "http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/uefi/grub2-amd64/current/grubnetx64.efi.signed"
     dest: "{{ item }}"
     checksum: "sha256:442a13ce54100d4f51b1ec68d495a6eacf9fd06b862ed3ed51ec5ae159f18f84"
@@ -79,19 +79,19 @@
     # - "{{ playbook_dir }}/data/files/pxelinux.0"
 
 - name: Render GRUB config
-  template:
+  ansible.builtin.template:
     src: grub.cfg.j2
     dest: "{{ playbook_dir }}/data/files/grub/grub.cfg"
     mode: 0644
 
 - name: Render default cloudinit meta-data
-  template:
+  ansible.builtin.template:
     src: meta-data.j2
     dest: "{{ playbook_dir }}/data/files/cloud-init/meta-data"
     mode: 0644
 
 - name: Render default cloudinit user-data
-  template:
+  ansible.builtin.template:
     src: generic-user-data.j2
     dest: "{{ playbook_dir }}/data/files/cloud-init/user-data"
     mode: 0644
