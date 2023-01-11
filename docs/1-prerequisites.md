@@ -1,7 +1,5 @@
 # Prerequitites & Preparation
 
-A global prerequisite is the existence of a VMWare vSphere ESXi host/cluster managed by a VCSA instance
-
 ## direnv
 
 It is advisable to install [direnv](https://github.com/direnv/direnv) to persist

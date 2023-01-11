@@ -18,3 +18,13 @@ _With inspiration from the k8s-at-home community, especially [onedr0p's cluster 
   - [Crowdsec](./notes/crowdsec.md)
   - [Format and Mount Drives](./notes/format_and_mount.md)
   - [Bootable Ubuntu USB](./notes/ubuntu_usb.md)
+
+## 📂 Repository structure
+
+```txt
+ansible
+├── inventory - ansible inventory definitions, group_vars, and host_vars
+├── playbooks
+└── roles
+main.tf - terraform definitions
+```
