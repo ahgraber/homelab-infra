@@ -13,7 +13,7 @@ k3s_release_version: "v1.24.8+k3s1"
 k3s_install_hard_links: true
 
 # (bool) Escalate user privileges for all tasks
-# k3s_become_for_all: true # deprecated in ansible role v3.0.0
+k3s_become_for_all: true # deprecated in ansible role v3.0.0
 k3s_become: true
 
 # (bool) Enable debug logging on the k3s service

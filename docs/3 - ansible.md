@@ -73,13 +73,8 @@ cd ./ansible/
 ansible-galaxy install -r requirements.yaml --force
 ansible-galaxy collection install -r requirements.yaml  --force
 
-### assuming we're using 'kubernetes' as group identifier
-# reboot hosts
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/reboot.yaml --become
+### assuming we're using 'ubuntu' as group identifier
 ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/reboot.yaml --become
-
-# shutdown hosts
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/shutdown.yaml --become
 ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/shutdown.yaml --become
 
 # Ubuntu setup
@@ -95,9 +90,6 @@ ansible-playbook -i ./inventory -l crowdsec ./playbooks/crowdsec/crowdsec.yaml -
 
 # Install additional packages on TrueNas Scale
 ansible-playbook -i ./inventory -l nas ./playbooks/truenas/packages.yaml --become
-
-# Clean up rook-ceph
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-cleanup.yaml --become # --ask-become-pass
 ```
 
 ## k3s install
@@ -107,11 +99,14 @@ ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-c
 cd ./ansible/
 
 ### assuming we're using 'kubernetes' as group identifier
-# install
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-prep.yaml --become --ask-become-pass
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-install.yaml --become --ask-become-pass
-# # get kubeconfig file
-# cp /tmp/kubeconfig ./kubeconfig
+# prep
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-prep.yaml --become # --ask-become-pass
+# install -- this may take 2 runs to complete without error
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-install.yaml --become # --ask-become-pass
+# copy kubeconfig to homelab-gitops-k3s
+
+# reboot
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-reboot.yaml --become
 ```
 
 ## use k3s
@@ -127,9 +122,9 @@ See [homelab-gitops-k3s](https://github.com/ahgraber/homelab-gitops-k3s)
 
 ```sh
 # uninstall
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-nuke.yaml --become --ask-become-pass
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-nuke.yaml --become # --ask-become-pass
 # clean up rook-ceph
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-cleanup.yaml --become --ask-become-pass
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-cleanup.yaml --become # --ask-become-pass
 # reboot
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/reboot.yaml --become
 ```
