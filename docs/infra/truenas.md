@@ -75,7 +75,7 @@
 Refs:
 <!-- markdownlint-disable MD034 -->
 - https://www.servethehome.com/building-a-lab-part-3-configuring-vmware-esxi-and-truenas-core/
-   [democratic-csi/README.md](https://github.com/ahgraber/homelab-gitops-k3s/blob/main/cluster/core/democratic-csi/README.md)
+   [democratic-csi/README.md](https://github.com/ahgraber/homelab-gitops-k3s/blob/main/kubernetes/apps/democratic-csi/README.md)
 <!-- markdownlint-enable -->
 
 #### NFS shares
@@ -105,7 +105,7 @@ Refs:
 #### Enable WebDav share to host files
 
 > PXEboot server
-> See [pxe.md](pxe.md)
+> See [pxe.md](../pxe.md)
 >
 > 1. Create `pxeboot` dataset
 > 2. Create `webdav` share for `pxeboot` dataset

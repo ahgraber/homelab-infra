@@ -71,15 +71,15 @@ markdown_extensions:
 
 # Navigation structure
 nav:
-  - Introduction: index.md # formerly hardlinked to README.md
+  - Introduction: ./index.md # formerly hardlinked to README.md
   - Installation:
       - Prerequisites: ./1-prerequisites.md
       - Terraform: ./2-terraform.md
       - PXE: ./pxe.md
       - Ansible: ./3-ansible.md
   - Infra:
-      - TrueNAS: ./truenas.md
-      - UPS: ./ups.md
+      - TrueNAS: ./infra/truenas.md
+      - UPS: ./infra/ups.md
   - Notes:
       - Crowdsec: ./notes/crowdsec.md
       - Format and Mount Drives: ./notes/format_and_mount.md

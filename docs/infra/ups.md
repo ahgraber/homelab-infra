@@ -44,7 +44,7 @@ Refs:
 
 3. Find configuration: System Settings > Services > UPS
 
-4. ![TrueNAS config](./images/TrueNAS%20UPS%20config.png)
+4. ![TrueNAS config](../images/TrueNAS%20UPS%20config.png)
 
 5. Test that it actually shuts devices down:
 

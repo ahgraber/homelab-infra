@@ -12,8 +12,8 @@ _With inspiration from the k8s-at-home community, especially [onedr0p's cluster 
 - [🧚 Provision with PXE](./pxe.md)
 - [🤖 Manage with Ansible](./3-ansible.md)
 - Infra
-  - [TrueNAS SCALE](./truenas.md)
-  - [UPS](./ups.md)
+  - [TrueNAS SCALE](./infra/truenas.md)
+  - [UPS](./infra/ups.md)
 - Notes
   - [Crowdsec](./notes/crowdsec.md)
   - [Format and Mount Drives](./notes/format_and_mount.md)
