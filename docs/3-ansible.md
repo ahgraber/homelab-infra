@@ -81,10 +81,13 @@ ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/shutdown.yaml --bec
 ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/os-init.yaml --become --ask-become-pass
 
 # Ubuntu/apt upgrade
-ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/upgrade.yaml
+ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/apt-update.yaml
 
 # Crowdsec setup
-ansible-playbook -i ./inventory -l crowdsec ./playbooks/crowdsec/crowdsec.yaml --become
+ansible-playbook -i ./inventory -l crowdsec ./playbooks/crowdsec/cs-install.yaml --become
+
+# Ubuntu OS upgrade
+ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/os-upgrade.yaml
 
 # ...
 
@@ -105,15 +108,17 @@ ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-prep.ya
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-install.yaml --become # --ask-become-pass
 # copy kubeconfig to homelab-gitops-k3s
 
-# reboot
+# rollout-reboot
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-reboot.yaml --become
+# hard reboot
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/reboot.yaml --become
 ```
 
 ## use k3s
 
 ```sh
 kubectl --kubeconfig=${KUBECONFIG} get nodes -o wide
-kubectl --kubeconfig=${KUBECONFIG} get pods -A
+kubectl --kubeconfig=${KUBECONFIG} get pods -A -o wide
 ```
 
 See [homelab-gitops-k3s](https://github.com/ahgraber/homelab-gitops-k3s)
@@ -125,6 +130,6 @@ See [homelab-gitops-k3s](https://github.com/ahgraber/homelab-gitops-k3s)
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-nuke.yaml --become # --ask-become-pass
 # clean up rook-ceph
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-cleanup.yaml --become # --ask-become-pass
-# reboot
+# hard reboot
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/reboot.yaml --become
 ```

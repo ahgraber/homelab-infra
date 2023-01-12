@@ -8,9 +8,6 @@
             path: /etc/apt/keyrings
             state: directory
             mode: "0755"
-        # - name: Add crowdsec key
-        #   ansible.builtin.shell: |
-        #     curl -fsSL https://packagecloud.io/crowdsec/crowdsec/gpgkey | gpg --dearmor > /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
         - name: Add crowdsec key
           ansible.builtin.apt_key:
             url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
@@ -18,15 +15,11 @@
             keyring: /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
         - name: Add crowdsec apt repository
           ansible.builtin.apt_repository:
-            repo: deb https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+            repo: |
+              deb [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+              deb-src [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
             state: present
             filename: crowdsec
-        - name: Add crowdsec src repository
-          ansible.builtin.apt_repository:
-            repo: deb-src https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
-            state: present
-            filename: crowdsec-src
-            update_cache: true
         - name: Install crowdsec packages
           ansible.builtin.apt:
             name: crowdsec

@@ -1,0 +1,117 @@
+---
+- hosts:
+    - ubuntu
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Pausing for 5 seconds...
+      pause:
+        seconds: 5
+    - name: Wait for availability
+      wait_for_connection:
+        delay: 0
+        timeout: 300
+
+  tasks:
+    - name: Check release train is set to use LTS versions
+      ansible.builtin.lineinfile:
+        name: /etc/update-manager/release-upgrades
+        regexp: "^Prompt=lts"
+        state: absent
+      check_mode: true # run without changing
+      changed_when: false
+      register: lts
+      failed_when: not lts.found
+
+    - name: Perform a dist-upgrade.
+      ansible.builtin.apt:
+        upgrade: dist
+        update_cache: true
+
+    - name: Check if a reboot is required.
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+        get_md5: false
+      register: reboot_required_file
+
+    - name: Reboot the server (if required).
+      ansible.builtin.reboot:
+      when: reboot_required_file.stat.exists == true
+
+    - name: Update all packages; remove dependencies that are no longer required.
+      ansible.builtin.apt:
+        upgrade: full
+        update_cache: true
+        cache_valid_time: 3600
+        autoclean: true
+        autoremove: true
+      register: apt_upgrade
+      retries: 5
+      until: apt_upgrade is success
+
+    - name: Register uname
+      ansible.builtin.command: uname -mrs
+      register: uname
+      changed_when: false
+
+    - name: Register lsb_release
+      ansible.builtin.command: lsb_release -a
+      register: lsb_release
+      changed_when: false
+
+    - name: Update UFW for failover ssh (allow 1022/tcp)
+      community.general.ufw:
+        rule: allow
+        port: "1022"
+        proto: tcp
+        comment: Open port ssh tcp port 1022 as failsafe option for upgrades'
+
+    - name: Ensure upgrader package is installed
+      ansible.builtin.apt:
+        name: ubuntu-release-upgrader-core
+        state: present
+        update_cache: true
+
+    - name: Upgrade OS
+      ansible.builtin.command: do-release-upgrade -f DistUpgradeViewNonInteractive
+
+    - name: Remove failover ssh from UFW
+      community.general.ufw:
+        rule: allow
+        port: "1022"
+        proto: tcp
+        delete: true
+
+    # - name: Validate uname updated
+    #   ansible.builtin.command: uname -mrs
+    #   register: uname_new
+    #   changed_when: false
+    #   failed_when: "uname.stdout == uname_new.stdout"
+
+    - name: Validate lsb_release updated
+      ansible.builtin.command: lsb_release -a
+      register: lsb_release_new
+      changed_when: false
+      failed_when: "lsb_release.stdout == lsb_release_new.stdout"
+
+    - name: Check if a reboot is required.
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+        get_md5: false
+      register: reboot_required_file
+
+    - name: Reboot the server (if required).
+      ansible.builtin.reboot:
+      when: reboot_required_file.stat.exists == true
+
+    - name: Update all packages; remove dependencies that are no longer required.
+      ansible.builtin.apt:
+        upgrade: full
+        update_cache: true
+        cache_valid_time: 3600
+        autoclean: true
+        autoremove: true
+      register: apt_upgrade
+      retries: 5
+      until: apt_upgrade is success

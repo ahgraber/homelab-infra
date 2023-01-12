@@ -1,31 +1,33 @@
 ---
-# # jammy (22.04) --------------------------------------------------------------
-# ## for localhost configuration
-# iso_url: "https://releases.ubuntu.com/jammy/ubuntu-22.04-live-server-amd64.iso"
-# iso_checksum: "sha256:84aeaf7823c8c61baa0ae862d0a06b03409394800000b3235854a6b38eb4856f"
-# efi_url: "http://archive.ubuntu.com/ubuntu/dists/jammy/main/uefi/grub2-amd64/current/grubx64.efi.signed"
-# efi_checksum: "sha256:06b136aa8ff99ec4423459aadf86071fb8e01cee992b0000a28765552b02162c"
-
-# ## use as netboot url
-# daily_iso_url: "https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/jammy-live-server-amd64.iso"
-# # daily_iso_checksum: "https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/SHA256SUMS" # then grep the correct sha
-
-# ## pxe
-# pxe_iso_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/iso/ubuntu-22.04-live-server-amd64.iso"
-# pxe_cloudconfig_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init"
-
-# focal (20.04) --------------------------------------------------------------
+# jammy (22.04) --------------------------------------------------------------
+os_codename: "jammy"
 ## for localhost configuration
-iso_url: https://releases.ubuntu.com/20.04/ubuntu-20.04.4-live-server-amd64.iso
-iso_checksum: sha256:28ccdb56450e643bad03bb7bcf7507ce3d8d90e8bf09e38f6bd9ac298a98eaad
-efi_url: http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/uefi/grub2-amd64/current/grubx64.efi.signed
-efi_checksum: sha256:f98539ffb0284eb2d45ab83602d5bbeb0605140b4240d37b0ca7f564f9c8fa18
-# pxelinux_folder: "http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/installer-amd64/current/legacy-images/netboot/"
+iso_url: "https://releases.ubuntu.com/jammy/ubuntu-22.04.1-live-server-amd64.iso"
+iso_checksum: "sha256:10f19c5b2b8d6db711582e0e27f5116296c34fe4b313ba45f9b201a5007056cb"
+efi_url: "http://archive.ubuntu.com/ubuntu/dists/jammy/main/uefi/grub2-amd64/current/grubnetx64.efi.signed"
+efi_checksum: "sha256:d88356ebb5ad231ba0cd5104c1a8d6eb9d730cb627e30fd5764d9985a471149d"
 
 ## use as netboot url
-daily_iso_url: http://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/focal-live-server-amd64.iso
-# daily_iso_checksum: "https://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/SHA256SUMS" # then grep the correct sha
+daily_iso_url: "https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/jammy-live-server-amd64.iso"
+# daily_iso_checksum: "https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/SHA256SUMS" # then grep the correct sha
 
 ## pxe
-pxe_iso_url: https://truenas.ninerealmlabs.com:8081/pxeboot/iso/ubuntu-20.04.4-live-server-amd64.iso
-pxe_cloudconfig_url: https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init/ # trailing slash is important!
+pxe_iso_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/iso/ubuntu-22.04.1-live-server-amd64.iso"
+pxe_cloudconfig_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init/" # trailing slash is important!
+
+# # focal (20.04) --------------------------------------------------------------
+# os_codename: "focal"
+# ## for localhost configuration
+# iso_url: "https://releases.ubuntu.com/20.04/ubuntu-20.04.4-live-server-amd64.iso"
+# iso_checksum: "sha256:28ccdb56450e643bad03bb7bcf7507ce3d8d90e8bf09e38f6bd9ac298a98eaad"
+# efi_url: "http://archive.ubuntu.com/ubuntu/dists/focal/main/uefi/grub2-amd64/current/grubnetx64.efi.signed"
+# efi_checksum: "sha256:279a5a755bc248d22799434a261b92698740ab817d8aeccbd0cb7409959a1463"
+# # pxelinux_folder: "http://archive.ubuntu.com/ubuntu/dists/focal-updates/main/installer-amd64/current/legacy-images/netboot/"
+
+# ## use as netboot url
+# daily_iso_url: "http://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/focal-live-server-amd64.iso"
+# # daily_iso_checksum: "https://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/SHA256SUMS" # then grep the correct sha
+
+# ## pxe
+# pxe_iso_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/iso/ubuntu-20.04.4-live-server-amd64.iso"
+# pxe_cloudconfig_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init/" # trailing slash is important!

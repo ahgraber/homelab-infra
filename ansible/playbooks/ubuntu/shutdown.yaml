@@ -3,19 +3,25 @@
   become: true
   gather_facts: true
   any_errors_fatal: true
+  vars_prompt:
+    - name: reboot
+      prompt: |-
+        Are you sure you want to shut down (yes/no)?
+      default: "n"
+      private: false
   pre_tasks:
-    - name: Verify
-      pause:
-        prompt: This will shut down the specified hosts.  Please confirm (yes/no)
-      register: confirm_shutdown
+    - name: Check for confirmation
+      ansible.builtin.fail:
+        msg: Exiting at user request ...
+      when: reboot != 'yes'
 
-    - name: Confirm
-      delegate_to: localhost
-      run_once: true
-      assert:
-        that: confirm_shutdown.user_input | bool
-        fail_msg: Exiting at user request ...
-        success_msg: Continuing with shutdown ...
+    - name: Continuing with shutdown ...
+      ansible.builtin.pause:
+        seconds: 5
+    - name: Wait for availability
+      wait_for_connection:
+        delay: 10
+        timeout: 300
 
   tasks:
     - name: shutdown

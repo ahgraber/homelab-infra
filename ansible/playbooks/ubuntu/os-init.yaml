@@ -101,18 +101,20 @@
     - name: System Configuration
       tags: [system, setup]
       block:
-        - name: Disable swap at runtime
-          ansible.builtin.command: swapoff -a
-          when:
-            - ansible_swaptotal_mb > 0
-        - name: Disable swap at boot
-          ansible.posix.mount:
-            name: "{{ item }}"
-            fstype: swap
-            state: absent
-          loop: [none, swap]
-        - name: network ups tools
-          when: "'metal' in {{ group_names }}"
+        - name: Disable swap
+          block:
+            - name: Disable swap at runtime
+              ansible.builtin.command: swapoff -a
+              when:
+                - ansible_swaptotal_mb > 0
+            - name: Disable swap at boot
+              ansible.posix.mount:
+                name: "{{ item }}"
+                fstype: swap
+                state: absent
+              loop: [none, swap]
+        - name: Configure Network UPS Tools
+          when: "'metal' in group_names"
           block:
             - name: Force systemd to reload itself
               systemd:
@@ -120,17 +122,17 @@
             - name: configure upsmon.conf
               ansible.builtin.template:
                 src: nut/upsmon.conf.j2
-                dest: "{{ nut_config_path }}/upsmon.conf"
+                dest: "{{ nut.nut_config_path }}/upsmon.conf"
                 owner: root
-                group: "{{ nut_user }}"
+                group: "{{ nut.nut_user }}"
                 mode: 0640
               register: upsmon_conf_result
             - name: configure nut.conf
               ansible.builtin.template:
-                dest: "{{ nut_config_path }}/nut.conf"
+                dest: "{{ nut.nut_config_path }}/nut.conf"
                 src: nut/nut.conf.j2
                 owner: root
-                group: "{{ nut_user }}"
+                group: "{{ nut.nut_user }}"
                 mode: 0640
               register: nut_conf_result
             - name: ensure nut services running & enabled

@@ -46,11 +46,10 @@ menuentry '{{ iso_url | basename | splitext | first }} (autoinstall)' --id=autoi
 }
 menuentry '{{ iso_url | basename | splitext | first }} (PXE)' --id=pxe {
     set gfxpayload=keep
-
     echo "Loading Kernel..."
     linux /vmlinuz \
         ip=dhcp \
-        url={{ daily_iso_url }} \
+        url={{ pxe_iso_url }} \
         cloud-config-url=/dev/null
     echo "Loading Ram Disk..."
     initrd /initrd
@@ -69,6 +68,6 @@ submenu 'Boot and Install with the HWE kernel' {
     menuentry "Install Ubuntu Server" {
         set gfxpayload=keep
         linux    /casper/hwe-vmlinuz   quiet  ---
-        initrd    /casper/hwe-initrd
+        initrd   /casper/hwe-initrd
     }
 }

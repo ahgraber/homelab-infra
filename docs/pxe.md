@@ -71,7 +71,7 @@ We will use TrueNAS with webdav http server.
    # ansible-galaxy collection install -r requirements.yaml
    # compile pxe components, launch server, and boot
 
-   # test render
+   # test render (use localhost password)
    ansible-playbook -i ./inventory ./playbooks/pxeboot/build.yaml --tags "render" --ask-become-pass
 
    # copy cloud-config to gist?

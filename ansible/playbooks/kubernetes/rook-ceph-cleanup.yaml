@@ -5,23 +5,27 @@
   become: true
   gather_facts: true
   any_errors_fatal: true
+  vars_prompt:
+    - name: nuke
+      prompt: |-
+        /!\  Are you sure you want to nuke rook-ceph cluster?  /!\
+        /!\  Have you already removed rook-ceph k8s resources?  /!\
+        Type YES I WANT TO NUKE ROOK-CEPH to proceed
+      default: "n"
+      private: false
   pre_tasks:
-    - name: Verify
-      pause:
-        prompt: |
-          Preparing to remove rook-ceph files local to nodes.
-          This will destroy all data!
-          Prior to this, confirm you have removed rook-ceph from the k8s cluster gitops.
-          Please confirm (yes/no)
-      register: confirm_remove
+    - name: Check for confirmation
+      ansible.builtin.fail:
+        msg: Aborted nuking the cluster
+      when: nuke != 'YES I WANT TO NUKE ROOK-CEPH'
 
-    - name: Confirm
-      delegate_to: localhost
-      run_once: true
-      assert:
-        that: confirm_remove.user_input | bool
-        fail_msg: Exiting at user request ...
-        success_msg: Continuing with cleanup ...
+    - name: Proceeding with rook-ceph cleanup ...
+      ansible.builtin.pause:
+        seconds: 5
+    - name: Wait for availability
+      wait_for_connection:
+        delay: 10
+        timeout: 300
 
   tasks:
     # assumes removal of cluster from k8s
@@ -30,19 +34,22 @@
         state: absent
         path: /var/lib/rook
 
-    - name: Zap the disk to a fresh, usable state (zap-all is important, b/c MBR has to be clean)
-      ansible.builtin.command: sgdisk --zap-all "{{ rook_block_device }}" || true
-    - name: Wipe a large portion of the beginning of the disk to remove more LVM metadata that may be present
-      ansible.builtin.command: dd if=/dev/zero of="{{ rook_block_device }}" bs=1M count=100 oflag=direct,dsync
-    - name: Wipe the block device with wipefs
-      ansible.builtin.command: wipefs --all --force "{{ rook_block_device }}"
-    - name: SSDs may be better cleaned with blkdiscard instead of dd
-      ansible.builtin.command: blkdiscard "{{ rook_block_device }}"
-    - name: Inform the OS of partition table changes
-      ansible.builtin.command: partprobe "{{ rook_block_device }}"
-    - name: Ceph can leave LVM and device mapper data that can lock the disks
-      ansible.builtin.command: "{{ item }}"
-      loop:
-        - ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %
-        - rm -rf /dev/ceph-*
-        - rm -rf /dev/mapper/ceph--*
+    - name: Clean up storage device
+      when: "'worker' in group_names"
+      block:
+        - name: Zap the disk to a fresh, usable state (zap-all is important, b/c MBR has to be clean)
+          ansible.builtin.command: sgdisk --zap-all "{{ rook_block_device }}" || true
+        - name: Wipe a large portion of the beginning of the disk to remove more LVM metadata that may be present
+          ansible.builtin.command: dd if=/dev/zero of="{{ rook_block_device }}" bs=1M count=100 oflag=direct,dsync
+        - name: Wipe the block device with wipefs
+          ansible.builtin.command: wipefs --all --force "{{ rook_block_device }}"
+        - name: SSDs may be better cleaned with blkdiscard instead of dd
+          ansible.builtin.command: blkdiscard "{{ rook_block_device }}"
+        - name: Inform the OS of partition table changes
+          ansible.builtin.command: partprobe "{{ rook_block_device }}"
+        - name: Ceph can leave LVM and device mapper data that can lock the disks
+          ansible.builtin.command: "{{ item }}"
+          loop:
+            - ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %
+            - rm -rf /dev/ceph-*
+            - rm -rf /dev/mapper/ceph--*
