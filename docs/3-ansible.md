@@ -1,5 +1,13 @@
 # Manage hosts with Ansible
 
+- [Manage hosts with Ansible](#manage-hosts-with-ansible)
+  - [Setup](#setup)
+  - [Check Ansible connection](#check-ansible-connection)
+  - [Host management](#host-management)
+  - [k3s install](#k3s-install)
+  - [use k3s](#use-k3s)
+  - [k3s uninstall](#k3s-uninstall)
+
 ## Setup
 
 1. Ensure .envrc vars are set

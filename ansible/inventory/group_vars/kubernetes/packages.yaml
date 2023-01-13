@@ -1,0 +1,15 @@
+---
+packages:
+  - ipvsadm
+  - lsscsi
+  - lvm2
+  - multipath-tools
+  - nfs-common
+  - open-iscsi
+  - psmisc
+  - python3-kubernetes
+  - scsitools
+  - sg3-utils
+# packages_remove:
+#   # - apparmor
+#   # - ufw

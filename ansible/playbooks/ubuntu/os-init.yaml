@@ -41,22 +41,22 @@
             name: "{{ packages | default([]) }}"
             state: present
             update_cache: true
-        - name: Add eternal terminal repository
+        - name: Packages | Add eternal terminal repository
           ansible.builtin.apt_repository:
             repo: ppa:jgmath2000/et
-        - name: Install custom packages
+        - name: Packages | Install custom packages
           ansible.builtin.apt:
             name: et
             state: present
             update_cache: true
+        - name: Packages | Remove packages
+          ansible.builtin.apt:
+            name: "{{ packages_remove | default([]) }}"
+            state: absent
         - name: Packages | Remove leaf packages
           ansible.builtin.apt:
+            autoclean: true
             autoremove: true
-    # - name: Remove packages
-    #   ansible.builtin.apt:
-    #     name: "{{ packages_remove }}"
-    #     state: absent
-    #     autoremove: true
     # - name: Remove cloud-init files
     #   ansible.builtin.file:
     #     state: absent
@@ -98,52 +98,42 @@
             dest: /etc/sudoers.d/{{ ansible_user }}_nopasswd
             mode: 0440
 
-    - name: System Configuration
+    - name: Network UPS Tools
       tags: [system, setup]
+      when: "'metal' in group_names"
       block:
-        - name: Disable swap
-          block:
-            - name: Disable swap at runtime
-              ansible.builtin.command: swapoff -a
-              when:
-                - ansible_swaptotal_mb > 0
-            - name: Disable swap at boot
-              ansible.posix.mount:
-                name: "{{ item }}"
-                fstype: swap
-                state: absent
-              loop: [none, swap]
-        - name: Configure Network UPS Tools
-          when: "'metal' in group_names"
-          block:
-            - name: Force systemd to reload itself
-              systemd:
-                daemon_reload: true
-            - name: configure upsmon.conf
-              ansible.builtin.template:
-                src: nut/upsmon.conf.j2
-                dest: "{{ nut.nut_config_path }}/upsmon.conf"
-                owner: root
-                group: "{{ nut.nut_user }}"
-                mode: 0640
-              register: upsmon_conf_result
-            - name: configure nut.conf
-              ansible.builtin.template:
-                dest: "{{ nut.nut_config_path }}/nut.conf"
-                src: nut/nut.conf.j2
-                owner: root
-                group: "{{ nut.nut_user }}"
-                mode: 0640
-              register: nut_conf_result
-            - name: ensure nut services running & enabled
-              service:
-                name: "{{ item }}"
-                state: restarted
-                enabled: true
-              with_items:
-                - nut-client
-                # - nut-driver
-                # - nut-server
+        - name: Force systemd to reload itself
+          systemd:
+            daemon_reload: true
+        - name: Configure upsmon.conf
+          ansible.builtin.template:
+            src: nut/upsmon.conf.j2
+            dest: "{{ nut.nut_config_path }}/upsmon.conf"
+            owner: root
+            group: "{{ nut.nut_user }}"
+            mode: 0640
+          register: upsmon_conf_result
+        - name: Configure nut.conf
+          ansible.builtin.template:
+            dest: "{{ nut.nut_config_path }}/nut.conf"
+            src: nut/nut.conf.j2
+            owner: root
+            group: "{{ nut.nut_user }}"
+            mode: 0640
+          register: nut_conf_result
+        - name: Ensure NUT services running & enabled
+          service:
+            name: "{{ item }}"
+            state: restarted
+            enabled: true
+          with_items:
+            - nut-client
+            # - nut-driver
+            # - nut-server
 
-    - name: reboot
-      reboot:
+      notify: Reboot
+
+  handlers:
+    - name: Reboot
+      ansible.builtin.reboot:
+        msg: Rebooting nodes
