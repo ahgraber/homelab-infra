@@ -3,6 +3,7 @@
 - [Manage hosts with Ansible](#manage-hosts-with-ansible)
   - [Setup](#setup)
   - [Check Ansible connection](#check-ansible-connection)
+  - [Send arbitrary commands](#send-arbitrary-commands)
   - [Host management](#host-management)
   - [k3s install](#k3s-install)
   - [use k3s](#use-k3s)
@@ -71,6 +72,12 @@ ansible all -i ./inventory --one-line -m 'ping'
 ansible all -i ./inventory --one-line -m 'ping' -vvv # for debugging
 ```
 
+## Send arbitrary commands
+
+```sh
+ansible <groupname> -m ansible.builtin.shell -a "apt upgrade -y" --become
+```
+
 ## Host management
 
 ```sh
@@ -135,6 +142,7 @@ See [homelab-gitops-k3s](https://github.com/ahgraber/homelab-gitops-k3s)
 
 ```sh
 # uninstall
+ansible kubernetes -m ansible.builtin.systemd -a "name=k3s state=stopped" --become
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-nuke.yaml --become # --ask-become-pass
 # clean up rook-ceph
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/rook-ceph-cleanup.yaml --become # --ask-become-pass
