@@ -10,14 +10,14 @@
       prompt: |-
         /!\  Are you sure you want to nuke rook-ceph cluster?  /!\
         /!\  Have you already removed rook-ceph k8s resources?  /!\
-        Type YES I WANT TO NUKE ROOK-CEPH to proceed
+        Type YES NUKE ROOK-CEPH to proceed
       default: "n"
       private: false
   pre_tasks:
     - name: Check for confirmation
       ansible.builtin.fail:
         msg: Aborted nuking the cluster
-      when: nuke != 'YES I WANT TO NUKE ROOK-CEPH'
+      when: nuke != 'YES NUKE ROOK-CEPH'
 
     - name: Proceeding with rook-ceph cleanup ...
       ansible.builtin.pause:

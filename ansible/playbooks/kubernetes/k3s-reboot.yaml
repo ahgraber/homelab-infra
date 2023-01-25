@@ -12,20 +12,34 @@
       ansible.builtin.pause:
         seconds: 5
   tasks:
+    # - name: Get absolute path to this Git repository
+    #   delegate_to: localhost
+    #   run_once: true
+    #   ansible.builtin.command: git rev-parse --show-toplevel
+    #   register: repo_abs_path
+
     - name: Draining node (this might take awhile)
+      # become: true
+      # delegate_to: localhost
       kubernetes.core.k8s_drain:
         state: drain
         name: "{{ inventory_hostname }}"
         delete_options:
           delete_emptydir_data: true
+          force: true
           ignore_daemonsets: true
-        force: true
-        terminate_grace_period: 900
+          terminate_grace_period: 900
+        # kubeconfig: "{{ repo_abs_path.stdout }}/kubeconfig"
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
       notify: Reboot
     - name: Uncordoning node
+      # become: true
+      # delegate_to: localhost
       kubernetes.core.k8s_drain:
         state: uncordon
         name: "{{ inventory_hostname }}"
+        # kubeconfig: "{{ repo_abs_path.stdout }}/kubeconfig"
+        kubeconfig: /etc/rancher/k3s/k3s.yaml
 
   handlers:
     - name: Reboot

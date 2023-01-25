@@ -51,5 +51,5 @@ k3s_server:
     # - "oidc-username-claim=email" # sub
     # - "oidc-groups-claim=groups"
     # - "oidc-groups-prefix=oidc:"
-  # node-taint:
-  #   - "node-role.kubernetes.io/control-plane=true:NoSchedule"
+  node-taint:
+    - "node-role.kubernetes.io/control-plane=true:NoSchedule"
