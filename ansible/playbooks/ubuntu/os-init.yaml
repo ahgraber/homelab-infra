@@ -41,14 +41,28 @@
             name: "{{ packages | default([]) }}"
             state: present
             update_cache: true
+
+        - name: Packages | Add eternal terminal key
+          ansible.builtin.apt_key:
+            url: https://mistertea.github.io/debian-et/et.gpg
+            state: present
+            keyring: /etc/apt/trusted.gpg.d/et.gpg
         - name: Packages | Add eternal terminal repository
           ansible.builtin.apt_repository:
-            repo: ppa:jgmath2000/et
-        - name: Packages | Install custom packages
-          ansible.builtin.apt:
-            name: et
-            state: present
-            update_cache: true
+            # ubuntu jammy == debian bookworm
+            repo:
+              deb [signed-by=/etc/apt/trusted.gpg.d/et.gpg] https://mistertea.github.io/debian-et/debian-source/
+              bookworm main
+
+        # - name: Packages | Add eternal terminal repository
+        #   ansible.builtin.apt_repository:
+        #     repo: ppa:jgmath2000/et
+        # - name: Packages | Install custom packages
+        #   ansible.builtin.apt:
+        #     name: et
+        #     state: present
+        #     update_cache: true
+
         - name: Packages | Remove packages
           ansible.builtin.apt:
             name: "{{ packages_remove | default([]) }}"

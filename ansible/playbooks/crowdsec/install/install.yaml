@@ -3,23 +3,18 @@
   block:
     - name: Install Crowdsec
       block:
-        - name: Create a directory if it does not exist
-          ansible.builtin.file:
-            path: /etc/apt/keyrings
-            state: directory
-            mode: "0755"
         - name: Add crowdsec key
           ansible.builtin.apt_key:
+            keyring: /etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg
             url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
             state: present
-            keyring: /etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg
         - name: Add crowdsec apt repository
           ansible.builtin.apt_repository:
-            repo: |
-              deb [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
-              deb-src [signed-by=/etc/apt/keyrings/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
-            state: present
             filename: crowdsec
+            repo: |
+              deb [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+            # deb-src [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+            state: present
         - name: Install crowdsec packages
           ansible.builtin.apt:
             name: crowdsec
