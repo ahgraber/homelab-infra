@@ -28,8 +28,10 @@
         - "'crowdsec_agents' in group_names"
 
     - name: Register agent to LAPI
-      ansible.builtin.command:
-        cscli lapi register --url http://{{ cs_delegate_server_listen_uri }} --machine {{ inventory_hostname }}
+      ansible.builtin.command: >
+        cscli lapi register
+        --url http://{{ cs_delegate_server_listen_uri }}
+        --machine {{ inventory_hostname }}
       when:
         - cs_multiserver
         - "'crowdsec_agents' in group_names"

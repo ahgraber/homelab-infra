@@ -50,8 +50,9 @@
         - name: Packages | Add eternal terminal repository
           ansible.builtin.apt_repository:
             # ubuntu jammy == debian bookworm
-            repo:
-              deb [signed-by=/etc/apt/trusted.gpg.d/et.gpg] https://mistertea.github.io/debian-et/debian-source/
+            repo: >
+              deb [signed-by=/etc/apt/trusted.gpg.d/et.gpg]
+              https://mistertea.github.io/debian-et/debian-source/
               bookworm main
 
         # - name: Packages | Add eternal terminal repository

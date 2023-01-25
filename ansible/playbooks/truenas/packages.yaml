@@ -42,8 +42,7 @@
       delegate_to: localhost
       ansible.builtin.get_url:
         # url: "{{ item.stdout }}"
-        url:
-          https://github.com/{{ item.item.user }}/{{ item.item.repo }}/releases/download/{{ item.tag }}/{{
+        url: https://github.com/{{ item.item.user }}/{{ item.item.repo }}/releases/download/{{ item.tag }}/{{
           item.item.repo }}_{{ item.tag | regex_replace('^v', '') }}_linux_amd64.bz2
         dest: "{{ playbook_dir }}/{{ item.item.repo }}.bz2"
       loop: "{{ latest.results }}"

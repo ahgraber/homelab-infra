@@ -75,7 +75,7 @@
     - name: Remove crowdsec apt repository
       ansible.builtin.apt_repository:
         filename: crowdsec
-        repo:
+        repo: >
           deb [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg]
           https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
         state: absent

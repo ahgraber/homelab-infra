@@ -24,7 +24,7 @@
 
         - name: Update firewall bouncer api_key
           ansible.builtin.replace:
-            path:
+            path: >
               /etc/crowdsec/bouncers/{{ item | regex_replace('^crowdsec-firewall-bouncer-nftables$',
               'crowdsec-firewall-bouncer') }}.yaml
             regexp: "api_key: [a-zA-Z0-9]*"
@@ -32,7 +32,7 @@
             backup: true
         - name: Update firewall bouncer api_uri
           ansible.builtin.replace:
-            path:
+            path: >
               /etc/crowdsec/bouncers/{{ item | regex_replace('^crowdsec-firewall-bouncer-nftables$',
               'crowdsec-firewall-bouncer') }}.yaml
             regexp: "api_url: 127.0.0.1:8080"
