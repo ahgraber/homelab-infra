@@ -1,0 +1,20 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    id0:
+      match:
+        name: en*
+      addresses:
+        - {{ ansible_host }}/{{ netplan.cidr }}
+      dhcp4: {{ netplan.dhcp4 | default(false) }}
+      dhcp6: {{ netplan.dhcp6 | default(false) }}
+      nameservers:
+        addresses:
+{% for item in netplan.nameservers %}
+          - {{ item }}
+{% endfor %}
+      routes:
+        - to: default
+          via: {{ netplan.gateway }}
+      wakeonlan: true

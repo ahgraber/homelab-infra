@@ -1,6 +1,17 @@
 ---
 ansible_user: ${user}
 
+### os
+netplan:
+  cidr: 16
+  gateway: 10.2.0.1
+  nameservers:
+    - 10.2.0.1
+    - 10.0.0.1
+  dhcp4: false
+  dhcp6: false
+
+### k3s
 domain: ${domain}
 
 ### kube-vip

@@ -1,5 +1,4 @@
 ---
-# (string) Timezone for the servers
 timezone: "America/New_York"
 
 ansible_user: ${user}
@@ -9,3 +8,13 @@ default_pass: ${default_pass}
 crypted_pass: ${crypted_pass}
 
 domain: ${domain}
+
+## netplan
+netplan:
+  cidr: 16
+  gateway: 10.2.0.1
+  nameservers:
+    - 10.2.0.1
+    - 10.0.0.1
+  dhcp4: false
+  dhcp6: false

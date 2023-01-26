@@ -48,8 +48,10 @@
         - name: Inform the OS of partition table changes
           ansible.builtin.command: partprobe "{{ rook_block_device }}"
         - name: Ceph can leave LVM and device mapper data that can lock the disks
+          ansible.builtin.command: ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %
+          ignore_errors: true
+        - name: Ceph can leave LVM and device mapper data that can lock the disks
           ansible.builtin.command: "{{ item }}"
           loop:
-            - ls /dev/mapper/ceph-* | xargs -I% -- dmsetup remove %
             - rm -rf /dev/ceph-*
             - rm -rf /dev/mapper/ceph--*

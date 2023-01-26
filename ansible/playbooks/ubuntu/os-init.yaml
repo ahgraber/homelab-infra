@@ -24,47 +24,53 @@
     - name: Networking
       tags: [networking, setup]
       block:
-        - name: Networking | Set hostname to inventory hostname
+        - name: Networking (1) | Set hostname to inventory hostname
           ansible.builtin.hostname:
             name: "{{ inventory_hostname }}"
-        - name: Networking | Update /etc/hosts to include inventory hostname
+        - name: Networking (1) | Update /etc/hosts to include inventory hostname
           ansible.builtin.blockinfile:
             path: /etc/hosts
             block: |
               127.0.1.1   {{ inventory_hostname }}
+        - name: Networking (2) | Replace netplan configuration
+          ansible.builtin.template:
+            src: netplan.j2
+            # Alphabetically later files, no matter what directory in,
+            # will amend keys if the key does not already exist and override previous keys if they do
+            dest: /etc/netplan/99-ansible-config.yaml
+            owner: root
+            group: root
+            mode: 0644
+          notify: Netplan apply
 
     - name: Packages | Ubuntu
       tags: [packages, setup]
       block:
-        - name: Packages | Install required packages
+        - name: Packages (1) | Install required packages
           ansible.builtin.apt:
             name: "{{ packages | default([]) }}"
             state: present
             update_cache: true
 
-        - name: Packages | Add eternal terminal key
-          ansible.builtin.apt_key:
-            url: https://mistertea.github.io/debian-et/et.gpg
-            state: present
-            keyring: /etc/apt/trusted.gpg.d/et.gpg
-        - name: Packages | Add eternal terminal repository
-          ansible.builtin.apt_repository:
-            # ubuntu jammy == debian bookworm
-            repo: >
-              deb [signed-by=/etc/apt/trusted.gpg.d/et.gpg]
-              https://mistertea.github.io/debian-et/debian-source/
-              bookworm main
-
-        # - name: Packages | Add eternal terminal repository
+        # - name: Packages (2) | Add eternal terminal key
+        #   ansible.builtin.apt_key:
+        #     url: https://mistertea.github.io/debian-et/et.gpg
+        #     state: present
+        #     keyring: /etc/apt/trusted.gpg.d/et.gpg
+        # - name: Packages (2) | Add eternal terminal repository
         #   ansible.builtin.apt_repository:
-        #     repo: ppa:jgmath2000/et
-        # - name: Packages | Install custom packages
+        #     # ubuntu jammy == debian bookworm
+        #     repo: >
+        #       deb [signed-by=/etc/apt/trusted.gpg.d/et.gpg]
+        #       https://mistertea.github.io/debian-et/debian-source/
+        #       bookworm main
+        # - name: Packages (2) | Install custom packages
         #   ansible.builtin.apt:
         #     name: et
         #     state: present
         #     update_cache: true
 
-        - name: Packages | Remove packages
+        - name: Packages (3) | Remove packages
           ansible.builtin.apt:
             name: "{{ packages_remove | default([]) }}"
             state: absent
@@ -149,6 +155,8 @@
       notify: Reboot
 
   handlers:
+    - name: Netplan apply
+      shell: netplan apply
     - name: Reboot
       ansible.builtin.reboot:
         msg: Rebooting nodes

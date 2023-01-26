@@ -1,27 +1,25 @@
 ---
 all:
   vars:
-    # ansible_pass: "{{ lookup('env', 'default_pass') }}"
-    # ansible_become_pass: "{{ lookup('env', 'default_pass') }}"
     ansible_ssh_port: 22
     ansible_ssh_common_args: -o StrictHostKeyChecking=no
 
   children:
     kubernetes:
-      # vars:
-      #   ansible_user: root
       children:
         controller:
-          children:
-            metal-ctrl:
-            # tf-ctrl:
+          hosts:
+            optiplex0:
+            optiplex1:
+            optiplex2:
         worker:
-          children:
-            metal-work:
-            # tf-work:
+          hosts:
+            optiplex3:
+            optiplex4:
+            optiplex5:
     ubuntu:
       children:
-        metal:
+        kubernetes:
         terraform:
         other:
     crowdsec:
@@ -35,13 +33,5 @@ all:
     infra:
       hosts:
         opnsense:
-        # ansible_host: 10.0.0.1
-        # ansible_user: admin
         truenas:
-    # ansible_host: 10.2.1.1
-    # ansible_user: admin
-    # pxe_path: "/mnt/ssdpool/pxeboot/"
-    # github_runner:
-    #   ansible_host: 10.2.1.11
-    #   ansible_user: nrl
     other:

@@ -1,0 +1,6 @@
+---
+ansible_host: 10.2.118.25
+mac: b0:4f:13:04:ba:c2
+disk: nvme0n1
+network_interface: enp2s0
+# storage: "/dev/sda"
