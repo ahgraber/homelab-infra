@@ -8,12 +8,15 @@
             keyring: /etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg
             url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
             state: present
-        - name: Add crowdsec apt repository
+        - name: Add crowdsec apt deb repository
           ansible.builtin.apt_repository:
-            filename: crowdsec
-            repo: |
-              deb [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
-            # deb-src [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+            filename: crowdsec_crowdsec
+            repo: deb [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu {{ ansible_distribution_release }} main
+            state: present
+        - name: Add crowdsec apt deb-src repository
+          ansible.builtin.apt_repository:
+            filename: crowdsec_crowdsec
+            repo: deb-src [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu {{ ansible_distribution_release }} main
             state: present
         - name: Install crowdsec packages
           ansible.builtin.apt:
@@ -63,6 +66,13 @@
           ansible.builtin.template:
             src: config.yaml.j2
             dest: "{{ cs_config_file_base }}/config.yaml"
+            owner: root
+            group: root
+            mode: 0644
+        - name: Set service
+          ansible.builtin.template:
+            src: service.j2
+            dest: "/etc/systemd/system/crowdsec.service"
             owner: root
             group: root
             mode: 0644

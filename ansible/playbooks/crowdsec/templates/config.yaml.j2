@@ -31,7 +31,7 @@ api:
   server:
     log_level: info
 {% if cs_multiserver %}
-    listen_uri: {{ cs_delegate_server_listen_uri }}
+    # listen_uri: {{ cs_delegate_server_listen_uri }}
 {% else %}
     listen_uri: 127.0.0.1:8080
 {% endif %}

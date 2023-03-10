@@ -74,10 +74,10 @@
 
     - name: Remove crowdsec apt repository
       ansible.builtin.apt_repository:
-        filename: crowdsec
-        repo: >
-          deb [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg]
-          https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
+        filename: crowdsec_crowdsec
+        # repo: >
+        #   deb [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg]
+        #   https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
         state: absent
     # - name: Remove crowdsec src repository
     #   ansible.builtin.apt_repository:
@@ -112,6 +112,13 @@
     - name: Clean up config directory
       file:
         path: "{{ cs_config_file_base }}"
+        state: absent
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Clean up service
+      file:
+        path: "/etc/systemd/system/crowdsec.service"
         state: absent
       when:
         - "'crowdsec_agents' in group_names"
