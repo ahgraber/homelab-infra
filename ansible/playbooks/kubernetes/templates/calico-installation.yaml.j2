@@ -16,6 +16,7 @@ spec:
         nodeSelector: all()
     linuxDataplane: Iptables
     multiInterfaceMode: None
+    containerIPForwarding: "Enabled"
     nodeAddressAutodetectionV4:
       cidrs:
         - "{{ calico_node_cidr }}"
