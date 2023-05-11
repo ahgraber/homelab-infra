@@ -110,6 +110,10 @@
           name: servicemonitors.monitoring.coreos.com
         - kind: CustomResourceDefinition
           name: thanosrulers.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: scrapeconfigs.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: prometheusagents.monitoring.coreos.com
       when:
         - k3s_server_manifests_templates | length > 0 or k3s_server_manifests_urls | length > 0
         - k3s_control_node is defined
