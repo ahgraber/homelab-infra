@@ -1,40 +1,56 @@
 ---
 - name: Register bouncer with LAPI
+  when:
+    - cs_multiserver
+    - "'crowdsec_agents' in group_names"
   block:
     - name: Check if bouncer is already registered
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
       ansible.builtin.shell: cscli bouncers list -o raw | grep {{ inventory_hostname }}-{{ item }} || echo 'Not found'
       register: _csbouncers
       changed_when: false
-      when:
-        - "'crowdsec_agents' in group_names"
-
     - name: Register bouncer to lapi
+      delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
+      ansible.builtin.command: cscli bouncer add {{ inventory_hostname }}-{{ item }} -o raw
+      register: _csbouncer_key
       when:
-        - cs_multiserver
-        - "'crowdsec_agents' in group_names"
         - _csbouncers.rc == 0
         - _csbouncers.stdout is search("Not found")
-      block:
-        - name: Register bouncer
-          delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
-          ansible.builtin.command: cscli bouncer add {{ inventory_hostname }}-{{ item }} -o raw
-          register: _csbouncer_key
-          changed_when: false
 
-        - name: Update firewall bouncer api_key
-          ansible.builtin.replace:
-            path: >
-              /etc/crowdsec/bouncers/{{ item | regex_replace('^crowdsec-firewall-bouncer-nftables$',
-              'crowdsec-firewall-bouncer') }}.yaml
-            regexp: "api_key: [a-zA-Z0-9]*"
-            replace: "api_key: {{ _csbouncer_key.stdout }}"
-            backup: true
-        - name: Update firewall bouncer api_uri
-          ansible.builtin.replace:
-            path: >
-              /etc/crowdsec/bouncers/{{ item | regex_replace('^crowdsec-firewall-bouncer-nftables$',
-              'crowdsec-firewall-bouncer') }}.yaml
-            regexp: "api_url: 127.0.0.1:8080"
-            replace: "api_url: {{ cs_delegate_server_listen_uri }}"
-            backup: true
+    - name: debug _csbouncer_key
+      debug:
+        var: _csbouncer_key
+
+    - name: Update firewall bouncer config
+      ansible.builtin.lineinfile:
+        regex: "{{ item.regex }}"
+        line: "{{ item.line }}"
+        dest: /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
+      loop:
+        - regex: "^api_url"
+          line: "api_url: http://{{ cs_delegate_server_listen_uri }}/"
+        - regex: "^api_key"
+          line: "api_key: {{ _csbouncer_key.stdout }}"
+      loop_control:
+        label: "{{ item.regex }}"
+      when:
+        - _csbouncer_key.changed
+
+    # - name: Update firewall bouncer api_key
+    #   ansible.builtin.replace:
+    #     path: >
+    #       /etc/crowdsec/bouncers/{{ item | regex_replace('^crowdsec-firewall-bouncer-nftables$',
+    #       'crowdsec-firewall-bouncer') }}.yaml
+    #     # path: /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
+    #     regexp: "api_key: [a-zA-Z0-9]*"
+    #     replace: "api_key: {{ _csbouncer_key.stdout }}"
+    #     backup: true
+    # - name: Update firewall bouncer api_uri
+    #   ansible.builtin.replace:
+    #     path: >
+    #       /etc/crowdsec/bouncers/{{ item | regex_replace('^crowdsec-firewall-bouncer-nftables$',
+    #       'crowdsec-firewall-bouncer') }}.yaml
+    #     # path: /etc/crowdsec/bouncers/crowdsec-firewall-bouncer.yaml
+    #     regexp: "api_url: 127.0.0.1:8080"
+    #     replace: "api_url: {{ cs_delegate_server_listen_uri }}"
+    #     backup: true

@@ -1,0 +1,57 @@
+---
+### NOTES
+# * Assumes lapi and agent are installed on each machine (equivalent to fail2ban config)
+# * this can (theoretically) be run in conjunction with crowdsec monitoring k8s virtual infra
+### REFERENCE
+# https://github.com/alf149/ansible-role-crowdsec
+# https://github.com/VeselaHouba/ansible-role-crowdsec
+
+- hosts: crowdsec
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+
+  pre_tasks:
+    - name: Pausing for 5 seconds...
+      pause:
+        seconds: 5
+    - name: Wait for availability
+      wait_for_connection:
+        delay: 0
+        timeout: 300
+
+  tasks:
+    - name: Hub update
+      ansible.builtin.shell: |
+        cscli hub update
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Force update collections
+      ansible.builtin.shell: |
+        collections=($(sudo cscli collections list -o raw | cut -d',' -f1))
+        # skip header "name" and get collections only
+        for c in "${collections[@]:1}";
+          do sudo cscli collections upgrade "$c" --force;
+        done
+      # when:
+      #   - "'crowdsec_agents' in group_names"
+
+    - name: Restart crowdsec (agent)
+      block:
+        - name: Restart crowdsec service
+          systemd:
+            name: crowdsec
+            daemon_reload: true
+            state: restarted
+        - name: Restart crowdsec-firewall-bouncer service
+          systemd:
+            name: crowdsec-firewall-bouncer
+            state: restarted
+      when:
+        - "'crowdsec_agents' in group_names"
+
+    - name: Restart crowdsec (LAPI)
+      ansible.builtin.shell: /usr/local/etc/rc.d/crowdsec restart
+      when:
+        - "'crowdsec_lapi_server' in group_names"

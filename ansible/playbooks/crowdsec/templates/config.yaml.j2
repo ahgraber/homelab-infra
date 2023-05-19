@@ -5,6 +5,10 @@ common:
   log_media: file
   log_level: info
   log_dir: /var/log/
+  log_max_size: 500
+  log_max_age: 28
+  log_max_files: 3
+  compress_logs: true
   working_dir: .
 config_paths:
   config_dir: /etc/crowdsec/
@@ -15,11 +19,16 @@ config_paths:
 crowdsec_service:
   acquisition_path: /etc/crowdsec/acquis.yaml
   parser_routines: 1
+  buckets_routines: 1
+  output_routines: 1
 cscli:
   output: human
+  hub_branch: master
+  color: auto
 db_config:
   log_level: info
   type: sqlite
+  use_wal: false
   db_path: /var/lib/crowdsec/data/crowdsec.db
   flush:
     max_items: 5000

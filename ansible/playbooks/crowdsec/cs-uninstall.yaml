@@ -37,17 +37,22 @@
         timeout: 300
 
   tasks:
-    - name: Stop crowdsec (agent)
+    - name: Stop crowdsec services (agent)
       block:
-        - name: Stop crowdsec service
-          systemd:
-            name: crowdsec
+        - name: Check services
+          ansible.builtin.service_facts:
+
+        - name: Stop crowdsec services
+          ansible.builtin.systemd:
+            name: "{{ item }}"
             daemon_reload: true
             state: stopped
-        - name: Stop crowdsec-firewall-bouncer service
-          systemd:
-            name: crowdsec-firewall-bouncer
-            state: stopped
+            enabled: false
+          when:
+            - "item in ansible_facts.services.keys()"
+          loop:
+            - crowdsec
+            - crowdsec-firewall-bouncer
       when:
         - "'crowdsec_agents' in group_names"
 
@@ -72,25 +77,23 @@
         - "'crowdsec_agents' in group_names"
         - cs_bouncers | length > 0
 
-    - name: Remove crowdsec apt repository
-      ansible.builtin.apt_repository:
-        filename: crowdsec_crowdsec
-        # repo: >
-        #   deb [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg]
-        #   https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
-        state: absent
-    # - name: Remove crowdsec src repository
-    #   ansible.builtin.apt_repository:
-    #     repo: deb-src https://packagecloud.io/crowdsec/crowdsec/ubuntu/ {{ ansible_distribution_release }} main
-    #     state: absent
-    #     filename: crowdsec-src
-    #     update_cache: true
-
-    - name: Remove crowdsec key
-      ansible.builtin.apt_key:
-        keyring: /etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg
-        url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
-        state: absent
+    - name: Uninstall Crowdsec Apt
+      block:
+        - name: Remove crowdsec apt deb repository
+          ansible.builtin.apt_repository:
+            filename: crowdsec_crowdsec
+            repo: deb [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu {{ ansible_distribution_release }} main
+            state: absent
+        - name: Remove crowdsec apt deb-src repository
+          ansible.builtin.apt_repository:
+            filename: crowdsec_crowdsec
+            repo: deb-src [signed-by=/etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg] https://packagecloud.io/crowdsec/crowdsec/ubuntu {{ ansible_distribution_release }} main
+            state: absent
+        - name: Remove crowdsec key
+          ansible.builtin.apt_key:
+            keyring: /etc/apt/trusted.gpg.d/crowdsec_crowdsec-archive-keyring.gpg
+            url: https://packagecloud.io/crowdsec/crowdsec/gpgkey
+            state: absent
 
     - name: Remove agent (lapi)
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
@@ -104,9 +107,11 @@
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
       command: cscli bouncer remove {{ inventory_hostname }}-{{ item }}
       loop: "{{ cs_bouncers }}"
-      # ignore_errors: true
+      register: bouncer_remove
+      failed_when:
+        - "'bouncer doesn''t exist' not in bouncer_remove.stderr and 'deleted successfully' not in bouncer_remove.stderr"
+      ignore_errors: true
       when:
-        # - cs_multiserver
         - "'crowdsec_agents' in group_names"
 
     - name: Clean up config directory
@@ -116,12 +121,20 @@
       when:
         - "'crowdsec_agents' in group_names"
 
-    - name: Clean up service
-      file:
-        path: "/etc/systemd/system/crowdsec.service"
-        state: absent
-      when:
-        - "'crowdsec_agents' in group_names"
+    - name: Clean up services
+      block:
+        - name: Remove bouncer service
+          file:
+            path: "/etc/systemd/system/crowdsec-firewall-bouncer.service"
+            state: absent
+          when:
+            - "'crowdsec_agents' in group_names"
+        - name: Remove crowdsec service
+          file:
+            path: "/etc/systemd/system/crowdsec.service"
+            state: absent
+          when:
+            - "'crowdsec_agents' in group_names"
 
     - name: Restart crowdsec (LAPI)
       shell: /usr/local/etc/rc.d/crowdsec restart
