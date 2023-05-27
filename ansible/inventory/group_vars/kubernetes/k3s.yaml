@@ -6,7 +6,7 @@
 
 # Use a specific version of k3s
 # for latest 'stable': https://update.k3s.io/v1-release/channels/stable
-k3s_release_version: "v1.26.0+k3s2"
+k3s_release_version: "v1.27.1+k3s1"
 
 # (bool) Install using hard links rather than symbolic links.
 # hint: if using system-upgrade-controller, use hard links
@@ -36,36 +36,22 @@ k3s_registration_address: "{{ kubevip_address }}"
 # /var/lib/rancher/k3s/server/manifests
 k3s_server_manifests_urls:
   # Kube-vip
-  - url: https://kube-vip.io/manifests/rbac.yaml
-    filename: kube-vip-rbac.yaml
+  - url: https://raw.githubusercontent.com/kube-vip/kube-vip/main/docs/manifests/rbac.yaml
+    filename: custom-kube-vip-rbac.yaml
   # Tigera Operator
-  - url: https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/tigera-operator.yaml
-    filename: calico-tigera-operator.yaml
-  # Prometheus Operator
-  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml
-    filename: prometheus-alertmanagerconfigs.yaml
-  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml
-    filename: prometheus-alertmanagers.yaml
+  - url: https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
+    filename: custom-calico-tigera-operator.yaml
+  # Essential Prometheus Operator CRDs
   - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
-    filename: prometheus-podmonitors.yaml
-  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml
-    filename: prometheus-probes.yaml
-  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml
-    filename: prometheus-prometheuses.yaml
+    filename: custom-prometheus-podmonitors.yaml
   - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml
-    filename: prometheus-prometheusrules.yaml
+    filename: custom-prometheus-prometheusrules.yaml
   - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
-    filename: prometheus-servicemonitors.yaml
-  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml
-    filename: prometheus-thanosrulers.yaml
-  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_scrapeconfigs.yaml
-    filename: prometheus-thanosrulers.yaml
-  - url: https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.65.1/example/prometheus-operator-crd/monitoring.coreos.com_prometheusagents.yaml
-    filename: prometheus-thanosrulers.yaml
+    filename: custom-prometheus-servicemonitors.yaml
 
 # (list) A flat list of templates to deploy on the primary control plane
 # /var/lib/rancher/k3s/server/manifests
 k3s_server_manifests_templates:
-  - calico-installation.yaml.j2
-  - kube-vip-daemonset.yaml.j2
-  # - kube-vip-cloud-controller-configmap.yaml.j2 # to replace metallb
+  - custom-calico-installation.yaml.j2
+  - custom-kube-vip-daemonset.yaml.j2
+  # - custom-kube-vip-cloud-controller-configmap.yaml.j2 # to replace metallb
