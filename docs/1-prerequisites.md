@@ -79,7 +79,8 @@ govc find -type s
 3. Update python requirements
 
    ```sh
-   pip3 install -r ./ansible/requirements.txt
+   # pip3 install -r ./ansible/requirements.txt
+   # use conda env instead :)
    ```
 
 ## [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)

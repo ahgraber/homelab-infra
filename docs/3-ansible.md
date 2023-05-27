@@ -126,7 +126,7 @@ ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-install
 # rollout-reboot
 ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-reboot.yaml --become
 # hard reboot
-ansible-playbook -i ./inventory -l kubernetes ./playbooks/ubuntu/reboot.yaml --become
+ansible-playbook -i ./inventory -l kubernetes ./playbooks/kubernetes/k3s-hardreboot.yaml --become
 ```
 
 ## use k3s
