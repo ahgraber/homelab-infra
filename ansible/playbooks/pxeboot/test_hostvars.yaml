@@ -1,23 +1,25 @@
 ---
-- hosts:
+- name: Test hostvars
+  hosts:
     - localhost
   gather_facts: false
 
   tasks:
-    # - debug: # "{{ item['inventory_hostname']['mac'] }}"
+    # - ansible.builtin.debug: # "{{ item['inventory_hostname']['mac'] }}"
     #    var: "mac - str{{ hostvars[item]['mac'] }}" #54:b2:03:70:8b:6c
     #   with_items:
     #     "{{ groups['nodes'] }}"
-    # - debug: # "{{ item['inventory_hostname']['mac'] }}"
+    # - ansible.builtin.debug: # "{{ item['inventory_hostname']['mac'] }}"
     #     var: "ipaddr - {{ hostvars[item]['ansible_host'] }}" # 10.2.118.10
     #   with_items:
     #     "{{ groups['nodes'] }}"
-    # - debug:
+    # - ansible.builtin.debug:
     #     var: "hostname - {{ hostvars[item]['inventory_hostname'] }}"
     #   with_items:
     #     "{{ groups['nodes'] }}"
 
-    - debug: # "{{ item['inventory_hostname']['mac'] }}"
+    - name: Debug
+      ansible.builtin.debug: # "{{ item['inventory_hostname']['mac'] }}"
         var: "{{ hostvars[item]['ansible_host'] }}"
       with_items: "{{ groups['nodes'] | default([]) }}"
       when: hostvars[item]

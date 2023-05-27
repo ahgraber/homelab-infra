@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Apt update
+  hosts: all
   become: true
   gather_facts: true
   any_errors_fatal: true
@@ -24,7 +25,7 @@
 
     - name: Reboot the server (if required).
       ansible.builtin.reboot:
-      when: reboot_required_file.stat.exists == true
+      when: reboot_required_file.stat.exists
 
     - name: Package upgrade
       ansible.builtin.apt:
@@ -45,4 +46,4 @@
 
     - name: Reboot the server (if required).
       ansible.builtin.reboot:
-      when: reboot_required_file.stat.exists == true
+      when: reboot_required_file.stat.exists

@@ -6,7 +6,8 @@
 # https://github.com/alf149/ansible-role-crowdsec
 # https://github.com/VeselaHouba/ansible-role-crowdsec
 
-- hosts: crowdsec_agents
+- name: Uninstall Crowdsec
+  hosts: crowdsec_agents
   become: true
   gather_facts: true
   any_errors_fatal: true
@@ -21,23 +22,25 @@
 
   pre_tasks:
     - name: Verify
-      pause:
+      ansible.builtin.pause:
         prompt: This will uninstall crowdsec from all _agent_ hosts.  Please confirm (yes/no)
       register: confirm_uninstall
     - name: Confirm
       delegate_to: localhost
       run_once: true
-      assert:
+      ansible.builtin.assert:
         that: confirm_uninstall.user_input | bool
         fail_msg: Exiting at user request ...
         success_msg: Continuing with uninstall ...
     - name: Wait for availability
-      wait_for_connection:
+      ansible.builtin.wait_for_connection:
         delay: 10
         timeout: 300
 
   tasks:
     - name: Stop crowdsec services (agent)
+      when:
+        - "'crowdsec_agents' in group_names"
       block:
         - name: Check services
           ansible.builtin.service_facts:
@@ -53,8 +56,6 @@
           loop:
             - crowdsec
             - crowdsec-firewall-bouncer
-      when:
-        - "'crowdsec_agents' in group_names"
 
     - name: Uninstall crowdsec packages
       ansible.builtin.apt:
@@ -97,7 +98,7 @@
 
     - name: Remove agent (lapi)
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
-      command: cscli machines remove {{ inventory_hostname }}
+      ansible.builtin.command: cscli machines remove {{ inventory_hostname }}
       # ignore_errors: true
       when:
         # - cs_multiserver
@@ -105,7 +106,7 @@
 
     - name: Remove bouncer
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
-      command: cscli bouncer remove {{ inventory_hostname }}-{{ item }}
+      ansible.builtin.command: cscli bouncer remove {{ inventory_hostname }}-{{ item }}
       loop: "{{ cs_bouncers }}"
       register: bouncer_remove
       failed_when:
@@ -115,7 +116,7 @@
         - "'crowdsec_agents' in group_names"
 
     - name: Clean up config directory
-      file:
+      ansible.builtin.file:
         path: "{{ cs_config_file_base }}"
         state: absent
       when:
@@ -124,19 +125,19 @@
     - name: Clean up services
       block:
         - name: Remove bouncer service
-          file:
+          ansible.builtin.file:
             path: "/etc/systemd/system/crowdsec-firewall-bouncer.service"
             state: absent
           when:
             - "'crowdsec_agents' in group_names"
         - name: Remove crowdsec service
-          file:
+          ansible.builtin.file:
             path: "/etc/systemd/system/crowdsec.service"
             state: absent
           when:
             - "'crowdsec_agents' in group_names"
 
     - name: Restart crowdsec (LAPI)
-      shell: /usr/local/etc/rc.d/crowdsec restart
+      ansible.builtin.command: /usr/local/etc/rc.d/crowdsec restart
       when:
         - "'crowdsec_lapi_server' in group_names"

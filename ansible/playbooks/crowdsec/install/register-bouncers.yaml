@@ -6,7 +6,9 @@
   block:
     - name: Check if bouncer is already registered
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
-      ansible.builtin.shell: cscli bouncers list -o raw | grep {{ inventory_hostname }}-{{ item }} || echo 'Not found'
+      ansible.builtin.shell: |
+        set -o pipefail
+        cscli bouncers list -o raw | grep {{ inventory_hostname }}-{{ item }} || echo 'Not found'
       register: _csbouncers
       changed_when: false
     - name: Register bouncer to lapi

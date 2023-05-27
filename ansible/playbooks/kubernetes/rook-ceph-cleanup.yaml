@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Rook-Ceph cluster cleanup
+  hosts:
     - controller
     - worker
   become: true
@@ -23,7 +24,7 @@
       ansible.builtin.pause:
         seconds: 5
     - name: Wait for availability
-      wait_for_connection:
+      ansible.builtin.wait_for_connection:
         delay: 10
         timeout: 300
 
@@ -45,7 +46,7 @@
           when: rook_block_devices is defined and rook_block_devices | length > 0
 
         - name: Wipe a large portion of the beginning of the disk to remove more LVM metadata that may be present
-          ansible.builtin.shell: |-
+          ansible.builtin.command: |-
             dd if=/dev/zero of={{ item.0 }} bs=1M count=100 oflag=direct,dsync
           loop:
             - "{{ rook_block_devices | default([]) }}"

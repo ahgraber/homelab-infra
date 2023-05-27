@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Prep for k3s install
+  hosts:
     - controller
     - worker
   become: true
@@ -7,11 +8,11 @@
   any_errors_fatal: true
   pre_tasks:
     - name: Pausing for 5 seconds...
-      pause:
+      ansible.builtin.pause:
         seconds: 5
 
     - name: Wait for availability
-      wait_for_connection:
+      ansible.builtin.wait_for_connection:
         delay: 0
         timeout: 300
 
@@ -33,17 +34,18 @@
             autoremove: true
 
     - name: System Configuration
+      notify: Reboot
       block:
         - name: System Configuration (1) | Disable ufw
           ansible.builtin.systemd:
-            service: ufw.service
+            ansible.builtin.service: ufw.service
             enabled: false
             masked: true
             state: stopped
           when: ansible_facts['distribution'] == 'Ubuntu'
         - name: System Configuration | Enable fstrim
           ansible.builtin.systemd:
-            service: fstrim.timer
+            ansible.builtin.service: fstrim.timer
             enabled: true
 
         - name: System Configuration (2) | Enable kernel modules now
@@ -102,8 +104,6 @@
             state: absent
           loop: [none, swap]
           when: ansible_facts['distribution'] == 'Ubuntu'
-
-      notify: Reboot
 
   handlers:
     - name: Reboot

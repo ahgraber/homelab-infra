@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Shutdown
+  hosts: all
   become: true
   gather_facts: true
   any_errors_fatal: true
@@ -19,10 +20,10 @@
       ansible.builtin.pause:
         seconds: 5
     - name: Wait for availability
-      wait_for_connection:
+      ansible.builtin.wait_for_connection:
         delay: 10
         timeout: 300
 
   tasks:
-    - name: shutdown
-      shell: shutdown
+    - name: Shutdown
+      ansible.builtin.command: shutdown

@@ -24,7 +24,9 @@
             state: present
             update_cache: true
         - name: Install cscli bash completion
-          ansible.builtin.shell: cscli completion bash | tee /etc/bash_completion.d/cscli
+          ansible.builtin.shell: |
+            set -o pipefail
+            cscli completion bash | tee /etc/bash_completion.d/cscli
           register: bash_completion_result
           changed_when: "'# bash completion for' not in bash_completion_result.stdout"
           failed_when: "'Error' in bash_completion_result.stderr"

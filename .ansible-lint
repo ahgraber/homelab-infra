@@ -1,7 +1,12 @@
 ---
 exclude_paths:
+  - .cache/ # implicit unless exclude_paths is defined in config
   - "*.sops.yaml"
+  - ansible/collections
+  - ansible/facts_cache
+  - ansible/roles/xanmanning.k3s
   - docs
+  - mkdocs.yaml
 skip_list:
   # replicate yamllint config
   - yaml[comments-indentation]
@@ -13,5 +18,5 @@ warn_list:
   - experimental
   - no-changed-when
 kinds:
-  - playbook: "**/playbooks/*.{yml,yaml}"
-  - tasks: "**/playbooks/crowdsec/install/*.{yml,yaml}"
+  - playbook: "ansible/playbooks/*.{yml,yaml}"
+  - tasks: "ansible/playbooks/crowdsec/install/*.{yml,yaml}"

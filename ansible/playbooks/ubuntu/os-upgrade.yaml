@@ -1,15 +1,16 @@
 ---
-- hosts:
+- name: Upgrade OS
+  hosts:
     - ubuntu
   become: true
   gather_facts: true
   any_errors_fatal: true
   pre_tasks:
     - name: Pausing for 5 seconds...
-      pause:
+      ansible.builtin.pause:
         seconds: 5
     - name: Wait for availability
-      wait_for_connection:
+      ansible.builtin.wait_for_connection:
         delay: 0
         timeout: 300
 
@@ -37,7 +38,7 @@
 
     - name: Reboot the server (if required).
       ansible.builtin.reboot:
-      when: reboot_required_file.stat.exists == true
+      when: reboot_required_file.stat.exists
 
     - name: Update all packages; remove dependencies that are no longer required.
       ansible.builtin.apt:
@@ -103,7 +104,7 @@
 
     - name: Reboot the server (if required).
       ansible.builtin.reboot:
-      when: reboot_required_file.stat.exists == true
+      when: reboot_required_file.stat.exists
 
     - name: Update all packages; remove dependencies that are no longer required.
       ansible.builtin.apt:

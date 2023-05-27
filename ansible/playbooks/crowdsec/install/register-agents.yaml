@@ -21,7 +21,9 @@
 
     - name: Check if agent is already registered
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
-      ansible.builtin.shell: cscli machines list -o raw | grep {{ inventory_hostname }} || echo 'Not found'
+      ansible.builtin.shell: |
+        set -o pipefail
+        cscli machines list -o raw | grep {{ inventory_hostname }} || echo 'Not found'
       register: _csmachines_registered
       changed_when: false
       when:
@@ -40,7 +42,9 @@
 
     - name: Check if agent is already validated
       delegate_to: "{{ groups['crowdsec_lapi_server'][0] }}"
-      ansible.builtin.shell: cscli machines list -o raw | grep {{ inventory_hostname }} | grep true || echo 'Not found'
+      ansible.builtin.shell: |
+        set -o pipefail
+        cscli machines list -o raw | grep {{ inventory_hostname }} | grep true || echo 'Not found'
       register: _csmachines_valid
       changed_when: false
       when:

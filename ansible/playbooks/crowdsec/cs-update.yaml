@@ -6,17 +6,18 @@
 # https://github.com/alf149/ansible-role-crowdsec
 # https://github.com/VeselaHouba/ansible-role-crowdsec
 
-- hosts: crowdsec
+- name: Update Crowdsec
+  hosts: crowdsec
   become: true
   gather_facts: true
   any_errors_fatal: true
 
   pre_tasks:
     - name: Pausing for 5 seconds...
-      pause:
+      ansible.builtin.pause:
         seconds: 5
     - name: Wait for availability
-      wait_for_connection:
+      ansible.builtin.wait_for_connection:
         delay: 0
         timeout: 300
 
@@ -29,6 +30,7 @@
 
     - name: Force update collections
       ansible.builtin.shell: |
+        set -o pipefail
         collections=($(sudo cscli collections list -o raw | cut -d',' -f1))
         # skip header "name" and get collections only
         for c in "${collections[@]:1}";
@@ -38,20 +40,20 @@
       #   - "'crowdsec_agents' in group_names"
 
     - name: Restart crowdsec (agent)
+      when:
+        - "'crowdsec_agents' in group_names"
       block:
         - name: Restart crowdsec service
-          systemd:
+          ansible.builtin.systemd:
             name: crowdsec
             daemon_reload: true
             state: restarted
         - name: Restart crowdsec-firewall-bouncer service
-          systemd:
+          ansible.builtin.systemd:
             name: crowdsec-firewall-bouncer
             state: restarted
-      when:
-        - "'crowdsec_agents' in group_names"
 
     - name: Restart crowdsec (LAPI)
-      ansible.builtin.shell: /usr/local/etc/rc.d/crowdsec restart
+      ansible.builtin.command: /usr/local/etc/rc.d/crowdsec restart
       when:
         - "'crowdsec_lapi_server' in group_names"

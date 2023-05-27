@@ -1,5 +1,6 @@
 ---
-- hosts:
+- name: Install k3s
+  hosts:
     - controller
     - worker
   become: true
@@ -8,10 +9,10 @@
   any_errors_fatal: true
   pre_tasks:
     - name: Pausing for 5 seconds...
-      pause:
+      ansible.builtin.pause:
         seconds: 5
     - name: Wait for availability
-      wait_for_connection:
+      ansible.builtin.wait_for_connection:
         delay: 0
         timeout: 300
 
@@ -43,7 +44,7 @@
     #     mode: 0755
 
     - name: Install Kubernetes
-      include_role:
+      ansible.builtin.include_role:
         name: xanmanning.k3s
         public: true
       vars:
@@ -126,7 +127,7 @@
     #   delegate_to: localhost
     #   become: true
     #   run_once: true
-    #   shell: |
+    #   ansible.builtin.shell: |
     #     #!/usr/bin/env bash
     #     export KUBECONFIG="{{ repo_abs_path.stdout }}/kubeconfig"
     #     export meta_namespace='{"metadata": {"annotations": {"meta.helm.sh/release-namespace": "tigera-operator"}}}'

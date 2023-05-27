@@ -1,19 +1,20 @@
 ---
 # ansible-playbook -i ./inventory -l nas ./playbooks/truenas/packages.yaml -K
-- hosts: nas
+- name: Install packages
+  hosts: nas
   become: true
   gather_facts: true
   any_errors_fatal: true
   pre_tasks:
     - name: Verify
-      pause:
+      ansible.builtin.pause:
         prompt: This will "sideload" packages on the specified hosts.  Please confirm (yes/no)
       register: confirm_install
 
     - name: Confirm
       delegate_to: localhost
       run_once: true
-      assert:
+      ansible.builtin.assert:
         that: confirm_install.user_input | bool
         fail_msg: Exiting at user request ...
         success_msg: Continuing with install ...
@@ -33,7 +34,7 @@
 
     - name: Debug latest
       delegate_to: localhost
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item.item.repo }}: {{ item.tag }}"
         verbosity: 2
       loop: "{{ latest.results }}"
@@ -49,7 +50,7 @@
 
     - name: Unarchive
       delegate_to: localhost
-      ansible.builtin.shell:
+      ansible.builtin.command:
         cmd: bzip2 -d "./{{ item.item.repo }}.bz2"
         creates: "{{ playbook_dir }}/{{ item.item.repo }}" # skip step if file exists
       loop: "{{ latest.results }}"
@@ -73,7 +74,7 @@
       loop: "{{ latest.results }}"
 
     - name: Debug to_delete
-      debug:
+      ansible.builtin.debug:
         msg: "{{ item.path }}"
         verbosity: 2
       loop: "{{ to_delete.results | map(attribute='files') | flatten }}"

@@ -1,15 +1,16 @@
 ---
-- hosts:
+- name: Init OS
+  hosts:
     - ubuntu
   become: true
   gather_facts: true
   any_errors_fatal: true
   pre_tasks:
     - name: Pausing for 5 seconds...
-      pause:
+      ansible.builtin.pause:
         seconds: 5
     - name: Wait for availability
-      wait_for_connection:
+      ansible.builtin.wait_for_connection:
         delay: 0
         timeout: 300
 
@@ -110,8 +111,8 @@
             key: "{{ item }}"
           # loop: "{{ ssh_authorized_keys | default([]) }}" # from group_var
           loop:
-            - "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_rsa.pub') }}"
-            - "{{ lookup('file', lookup('env','HOME') + '/.ssh/id_ed25519.pub') }}"
+            - "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub') }}"
+            - "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_ed25519.pub') }}"
         - name: User Configuration | Add user to sudoers
           ansible.builtin.copy:
             content: |
@@ -122,9 +123,10 @@
     - name: Network UPS Tools
       tags: [system, setup]
       when: "'metal' in group_names"
+      notify: Reboot
       block:
         - name: Force systemd to reload itself
-          systemd:
+          ansible.builtin.systemd:
             daemon_reload: true
         - name: Configure upsmon.conf
           ansible.builtin.template:
@@ -143,7 +145,7 @@
             mode: 0640
           register: nut_conf_result
         - name: Ensure NUT services running & enabled
-          service:
+          ansible.builtin.service:
             name: "{{ item }}"
             state: restarted
             enabled: true
@@ -152,11 +154,9 @@
             # - nut-driver
             # - nut-server
 
-      notify: Reboot
-
   handlers:
     - name: Netplan apply
-      shell: netplan apply
+      ansible.builtin.command: netplan apply
     - name: Reboot
       ansible.builtin.reboot:
         msg: Rebooting nodes

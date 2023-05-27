@@ -1,14 +1,15 @@
 ---
-- hosts: localhost
+- name: Test envvars
+  hosts: localhost
   connection: local
   gather_facts: true
 
   tasks:
     - name: Set facts from .envrc
-      set_fact:
+      ansible.builtin.set_fact:
         # envrc: "envrc['{{ item }}']: {{ lookup('env', '{{ item }}')"
         # envrc: "{{ envrc['{{ item }}'] }}: '{{ item }}'"
-        "{{item}}": "{{ lookup('env', '{{ item }}') }}"
+        "{{ item }}": "{{ lookup('env', '{{ item }}') }}"
       with_items:
         # - 'a'
         # - 'b'
@@ -24,8 +25,9 @@
     # vars:
     #   envrc: {}
 
-    - debug:
-        var: "{{item}}"
+    - name: Print passed facts
+      ansible.builtin.debug:
+        var: "{{ item }}"
       with_items:
         # - 'a'
         # - 'b'
@@ -39,8 +41,9 @@
         - crypted_pass
         - email
 
-    - debug:
-        var: "{{item}}"
+    - name: Print ipv4 vars
+      ansible.builtin.debug:
+        var: "{{ item }}"
       with_items:
         - ansible_default_ipv4.address
         - ansible_default_ipv4.broadcast
