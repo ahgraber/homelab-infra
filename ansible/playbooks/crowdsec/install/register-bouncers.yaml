@@ -17,10 +17,6 @@
         - _csbouncers.rc == 0
         - _csbouncers.stdout is search("Not found")
 
-    - name: debug _csbouncer_key
-      debug:
-        var: _csbouncer_key
-
     - name: Update firewall bouncer config
       ansible.builtin.lineinfile:
         regex: "{{ item.regex }}"
@@ -35,6 +31,7 @@
         label: "{{ item.regex }}"
       when:
         - _csbouncer_key.changed
+        - _csbouncer_key.stdout | length > 0
 
     # - name: Update firewall bouncer api_key
     #   ansible.builtin.replace:

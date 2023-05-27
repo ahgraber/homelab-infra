@@ -32,6 +32,12 @@
         # kubeconfig: "{{ repo_abs_path.stdout }}/kubeconfig"
         kubeconfig: /etc/rancher/k3s/k3s.yaml
       notify: Reboot
+
+    # - name: Reboot
+    #   ansible.builtin.reboot:
+    #     msg: Rebooting nodes
+    #     reboot_timeout: 3600
+
     - name: Uncordoning node
       # become: true
       # delegate_to: localhost
