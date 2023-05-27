@@ -23,25 +23,11 @@
       register: k3s_check_installed
       check_mode: false
 
-    - name: Set manifest facts
+    - name: Ignore manifests templates and urls if the cluster is already installed
       ansible.builtin.set_fact:
         k3s_server_manifests_templates: []
         k3s_server_manifests_urls: []
       when: k3s_check_installed.stat.exists
-
-    # - name: Create the k3s data directory
-    #   ansible.builtin.file:
-    #     path: /var/lib/rancher/k3s
-    #     state: directory
-    #     owner: root
-    #     group: root
-    #     mode: 0755
-    #
-    # - name: Copy audit-policy.yaml
-    #   ansible.builtin.template:
-    #     src: audit-policy.yaml.j2
-    #     dest: /var/lib/rancher/k3s/audit-policy.yaml
-    #     mode: 0755
 
     - name: Install Kubernetes
       ansible.builtin.include_role:
@@ -54,27 +40,29 @@
       delegate_to: localhost
       become: false
       run_once: true
-      ansible.builtin.command: git rev-parse --show-toplevel
+      check_mode: false
+      ansible.builtin.command: |-
+        git rev-parse --show-toplevel
       register: repo_abs_path
 
-    - name: Copy kubeconfig to repo root
+    - name: Copy kubeconfig project directory
       run_once: true
       ansible.builtin.fetch:
-        src: /etc/rancher/k3s/k3s.yaml
+        src: "/etc/rancher/k3s/k3s.yaml"
         dest: "{{ repo_abs_path.stdout }}/kubeconfig"
         flat: true
       when:
         - k3s_control_node is defined
         - k3s_control_node
 
-    - name: Update kubeconfig with the right IPv4 address
+    - name: Update kubeconfig with the correct IPv4 address
       delegate_to: localhost
       become: false
       run_once: true
       ansible.builtin.replace:
         path: "{{ repo_abs_path.stdout }}/kubeconfig"
-        regexp: https://127.0.0.1:6443
-        replace: https://{{ k3s_registration_address }}:6443
+        regexp: "https://127.0.0.1:6443"
+        replace: "https://{{ k3s_registration_address }}:6443"
 
     - name: Resource Readiness Check
       run_once: true
@@ -95,12 +83,27 @@
           namespace: kube-system
         - kind: Installation
           name: default
-        - name: podmonitors.monitoring.coreos.com
-          kind: CustomResourceDefinition
-        - name: prometheusrules.monitoring.coreos.com
-          kind: CustomResourceDefinition
-        - name: servicemonitors.monitoring.coreos.com
-          kind: CustomResourceDefinition
+        - kind: CustomResourceDefinition
+          name: alertmanagerconfigs.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: alertmanagers.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: podmonitors.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: probes.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: prometheuses.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: prometheusrules.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: servicemonitors.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: thanosrulers.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: scrapeconfigs.monitoring.coreos.com
+        - kind: CustomResourceDefinition
+          name: prometheusagents.monitoring.coreos.com
+      register: resource_check
       when:
         - k3s_server_manifests_templates | length > 0
           or k3s_server_manifests_urls | length > 0
@@ -117,45 +120,9 @@
         path: "{{ k3s_server_manifests_dir }}/{{ item | basename | regex_replace('\\.j2$', '') }}"
         state: absent
       loop: "{{ k3s_server_manifests_templates | default([]) }}"
+
     - name: Remove deployed manifest urls
       ansible.builtin.file:
         path: "{{ k3s_server_manifests_dir }}/{{ item.filename }}"
         state: absent
       loop: "{{ k3s_server_manifests_urls | default([]) }}"
-
-    # - name: Update calico for fluxcd/helm deployment
-    #   delegate_to: localhost
-    #   become: true
-    #   run_once: true
-    #   ansible.builtin.shell: |
-    #     #!/usr/bin/env bash
-    #     export KUBECONFIG="{{ repo_abs_path.stdout }}/kubeconfig"
-    #     export meta_namespace='{"metadata": {"annotations": {"meta.helm.sh/release-namespace": "tigera-operator"}}}'
-    #     export meta_name='{"metadata": {"annotations": {"meta.helm.sh/release-name": "tigera-operator"}}}'
-    #     export managed_by='{"metadata": {"labels": {"app.kubernetes.io/managed-by": "Helm"}}}'
-
-    #     kubectl patch installation default --type=merge -p "${meta_namespace}"
-    #     kubectl patch installation default --type=merge -p "${meta_name}"
-    #     kubectl patch installation default --type=merge -p "${managed_by}"
-    #     kubectl patch podsecuritypolicy tigera-operator --type=merge -p "${meta_namespace}"
-    #     kubectl patch podsecuritypolicy tigera-operator --type=merge -p "${meta_name}"
-    #     kubectl patch podsecuritypolicy tigera-operator --type=merge -p "${managed_by}"
-    #     kubectl patch -n tigera-operator deployment tigera-operator --type=merge -p "${meta_namespace}"
-    #     kubectl patch -n tigera-operator deployment tigera-operator --type=merge -p "${meta_name}"
-    #     kubectl patch -n tigera-operator deployment tigera-operator --type=merge -p "${managed_by}"
-    #     kubectl patch -n tigera-operator serviceaccount tigera-operator --type=merge -p "${meta_namespace}"
-    #     kubectl patch -n tigera-operator serviceaccount tigera-operator --type=merge -p "${meta_name}"
-    #     kubectl patch -n tigera-operator serviceaccount tigera-operator --type=merge -p "${managed_by}"
-    #     kubectl patch clusterrole tigera-operator --type=merge -p "${meta_namespace}"
-    #     kubectl patch clusterrole tigera-operator --type=merge -p "${meta_name}"
-    #     kubectl patch clusterrole tigera-operator --type=merge -p "${managed_by}"
-    #     kubectl patch clusterrolebinding tigera-operator tigera-operator --type=merge -p "${meta_namespace}"
-    #     kubectl patch clusterrolebinding tigera-operator tigera-operator --type=merge -p "${meta_name}"
-    #     kubectl patch clusterrolebinding tigera-operator tigera-operator --type=merge -p "${managed_by}"
-    #     kubectl patch apiserver default --type=merge -p "${meta_namespace}"
-    #     kubectl patch apiserver default --type=merge -p "${meta_name}"
-    #     kubectl patch apiserver default --type=merge -p "${managed_by}"
-
-    #     unset meta_namespace
-    #     unset meta_name
-    #     unset managed_by

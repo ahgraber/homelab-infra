@@ -100,6 +100,7 @@ ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/apt-update.yaml
 
 # Crowdsec setup
 ansible-playbook -i ./inventory -l crowdsec ./playbooks/crowdsec/cs-install.yaml --become
+ansible-playbook -i ./inventory -l crowdsec ./playbooks/crowdsec/cs-update.yaml --become
 
 # Ubuntu OS upgrade
 ansible-playbook -i ./inventory -l ubuntu ./playbooks/ubuntu/os-upgrade.yaml

@@ -16,9 +16,10 @@ k3s_server:
   flannel-backend: "none" # must be quoted # yamllint disable-line
   disable:
     - flannel # Disable flannel - replaced with Calico
-    - traefik # Disable traefik - installed with Flux
-    - servicelb # Disable servicelb - replaced with metallb and install with Flux
+    - local-storage # Disable local-path-provisioner - installed with Flux
     - metrics-server # Disable metrics-server - installed with Flux
+    - servicelb # Disable servicelb - replaced with metallb and install with Flux
+    - traefik # Disable traefik - ingress-nginx installed with Flux
   disable-network-policy: true
   disable-cloud-controller: true
   write-kubeconfig-mode: "644"
@@ -38,18 +39,8 @@ k3s_server:
   kube-apiserver-arg:
     ### Required for HAProxy health-checks
     - anonymous-auth=true
-    ### enable if setting audit-policy
-    # - "--audit-log-path=/var/lib/rancher/k3s/audit.log"
-    # - "--audit-policy-file=/var/lib/rancher/k3s/audit-policy.yaml"
-    # - "--audit-log-maxage=2"
     # https://github.com/k3s-io/k3s/issues/1264
     - default-not-ready-toleration-seconds=20
     - default-unreachable-toleration-seconds=20
-    # # Required for OIDC authentication
-    # - "oidc-issuer-url={{ kubernetes_oidc_issuer }}"
-    # - "oidc-client-id={{ kubernetes_oidc_clientid }}"
-    # - "oidc-username-claim=email" # sub
-    # - "oidc-groups-claim=groups"
-    # - "oidc-groups-prefix=oidc:"
   node-taint:
     - "node-role.kubernetes.io/control-plane=true:NoSchedule"

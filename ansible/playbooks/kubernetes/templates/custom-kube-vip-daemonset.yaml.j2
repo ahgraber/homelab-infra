@@ -22,8 +22,7 @@ spec:
         - name: kube-vip
           image: ghcr.io/kube-vip/kube-vip:v0.6.0
           imagePullPolicy: IfNotPresent
-          args:
-            - manager
+          args: ["manager"]
           env:
             # - name: vip_loglevel
             #   value: "5"
@@ -70,9 +69,7 @@ spec:
             #   value: "true"
           securityContext:
             capabilities:
-              add:
-                - NET_ADMIN
-                - NET_RAW
+              add: ["NET_ADMIN", "NET_RAW"]
       hostAliases:
         - hostnames:
             - kubernetes
