@@ -10,6 +10,7 @@
       - [iSCSI shares](#iscsi-shares)
       - [NFS shares](#nfs-shares)
       - [SMB share / Time Machine volume](#smb-share--time-machine-volume)
+      - [S3 with Minio](#s3-with-minio)
       - [Enable WebDav share to host files](#enable-webdav-share-to-host-files)
   - [Troubleshooting](#troubleshooting)
     - [SMART test controls](#smart-test-controls)
@@ -100,6 +101,193 @@ Refs:
 <!-- markdownlint-disable MD034 -->
 - https://www.truenas.com/community/threads/multi-user-time-machine-purpose.99276/#post-684995
 - https://www.reddit.com/r/MacOS/comments/lh0yjc/configure_a_truenas_core_share_as_a_time_machine/
+<!-- markdownlint-enable -->
+
+#### S3 with Minio
+
+As of `TrueNAS-SCALE-22.12.3.1`, the integrated Minio/S3 service is deprecated.
+Instead, iXSystems suggests using the Minio app (which deploys a container via a TrueNAS k8s cluster).
+
+Documentation is poor; the community forum has a [decent walkthrough](https://www.truenas.com/community/threads/truenas-scale-s3-service-to-minio-application-migration.110787/), replicated here for reference.
+
+> If migrating from integrated Minio to Minio app, deploy both to migrate data.
+> Ensure the 'new' Minio uses nonstandard ports so there is no overlap/collision.
+
+1. Create a new ZFS dataset for minio
+
+2. Using the shell, create 2 directories within that dataset: `mkdir -p </path/to/minio/>{certs,data}`
+
+3. Create a TrueNAS cron job (System Settings → Advanced → Cron Jobs):
+
+   | Key | Value |
+   |-------------|----------|
+   | Description | Scrutiny |
+   | Command | cp /etc/certificates/le-prod-cert.crt /mnt/ssdpool/minio/certs/public.crt && cp /etc/certificates/le-prod-cert.key /mnt/ssdpool/minio/certs/private.key && chmod 444 /mnt/ssdpool/minio/certs/private.key |
+   | Run As User | root |
+   | Schedule | Daily |
+
+   <!-- ```sh
+   openssl x509 -inform PEM -in /etc/certificates/<public cert>.crt > </path/to/minio>/certs/public.crt \
+   && openssl rsa -in  /etc/certificates/<public cert>t.key -text >  </path/to/minio>/certs/private.key
+   ``` -->
+
+4. Create a minio deployment:
+   1. Apps > search "Minio" > Install
+   2. | Key | Value |
+      | --- | --- |
+      | Application Name | Minio |
+      | Version | (whatever is latest) [1.7.16] |
+      | **Workload Configuration** | |
+      | Update Strategy | Create new pods and then kill old ones |
+      | **Minio Configuration** | |
+      | Enable Distributed Mode | `disabled` [needs 4 instances] |
+      | Minio Extra Arguments | No items have been added |
+      | Root User | Access Key: <can be any english / verbal name> [lowercase only] |
+      | Root Password | Security Key: <long / complex password> [alpha-numeric only] |
+      | Minio Image Environment | No items have been added |
+      | **Minio Service Configuration** | |
+      | Port | default: `9000` |
+      | Console Port| default: `9002` |
+      | **Log Search API Configuration** | |
+      | Enable Log Search API | `Disabled` [Requires Postgres Database] |
+      | **Storage** | |
+      | Minio Data Mount Point Path | `/export` |
+      | Host Path for Minio Data Volume | `Enabled` |
+      | Host Path Data Volume | `</path/to/minio>/data` |
+      | Extra Host Path Volumes | |
+      | _Mount Path in Pod_ | `/etc/minio/certs` |
+      | _Host Path_ | `<path/to/minio>/certs/`|
+      | **Postgres Storage** | |
+      | Postgres Data Volume | `Disabled` |
+      | Postgres Backup Volume | `Disabled` |
+      | **Advanced DNS Settings** | |
+      | DNS Configuration / DNS Options | No items have been added |
+      | **Resource Limits** | |
+      | Enable Pod resource limits | `Disabled` |
+
+5. Edit the minio deployment to set deployment status probes to use `HTTPS`
+
+   ```sh
+   k3s kubectl edit deployment.apps/minio -n ix-minio
+   ```
+
+   Edit with vi -- use `i` to enter insert mode, `esc` to exit, and `:wq` to save and quit
+
+   ```yaml
+   livenessProbe:
+     failureThreshold: 5
+     httpGet:
+       path: /minio/health/live
+       port: 9001
+       scheme: HTTP
+     ...
+   readinessProbe:
+     failureThreshold: 5
+     httpGet:
+       path: /minio/health/live  
+       port: 9001
+       scheme: HTTP
+     ...
+   startupProbe:
+     failureThreshold: 60
+     httpGet:
+       path: /minio/health/live
+       port: 9001
+       scheme: HTTP
+     ...
+   ```
+
+6. If replacing built-in Minio service, replicate Minio deployments
+
+   1. Sync configurations (if needed) (NOTE: skipped this step)
+
+      ```sh
+      mc admin config export <old> > config.txt
+      # edit as needed
+      mc admin config import <new> < config.txt
+      ```
+
+   2. Compare policies and sync
+
+      ```sh
+      mc admin policy list <old>
+      mc admin policy list <new>
+      # if replication needed
+      mc admin policy info <old> <policyname> -f <policyname>.json
+      mc admin policy add <new> <policyname> <policyname>.json
+      ```
+
+   3. Export/add users
+
+      ```sh
+      mc admin user list <old>
+      # if replication needed
+      mc admin user add <new> <name>  # this will prompt for secret key
+      ```
+
+   4. Scale down k8s resources that require minio:
+
+      ```sh
+      # suspend
+      flux suspend hr -n default --all \
+        && kubectl scale deploy -n default --replicas=0 --all \
+        && kubectl annotate cluster postgres -n default --overwrite cnpg.io/hibernation=on
+      flux suspend hr -n datasci --all \
+        && kubectl scale deploy -n datasci --replicas=0 --all \
+        && kubectl annotate cluster datasci -n datasci --overwrite cnpg.io/hibernation=on
+      flux suspend hr -n monitoring --all \
+        && kubectl scale deploy -n monitoring --replicas=0 --all
+      flux suspend hr -n volsync --all \
+        && kubectl scale deploy -n volsync --replicas=0 --all
+      ```
+
+   5. Mirror data
+
+      > NOTE: run k8s scale-down (see below) before mirroring!
+
+      ```sh
+      mc mirror --preserve <old> <new>
+      ```
+
+   6. Stop and disable S3 Service to prevent it from restarting
+
+   7. Stop MinIO Application and adjust ports as needed to replace the S3 Service
+      1. Adjust in TrueNAS
+      2. Update `mc` config.json
+
+   8. Scale deployements back up
+
+      ```sh
+      # resume
+      kubectl annotate cluster postgres -n default cnpg.io/hibernation-
+      kubectl annotate cluster datasci -n datasci cnpg.io/hibernation-
+      flux resume hr -n default --all
+      flux resume hr -n datasci --all
+      flux resume hr -n monitoring --all
+      flux resume hr -n volsync --all
+      ```
+
+   9. Update prometheusconfig for new minio
+
+      ```sh
+      mc admin prometheus generate <new>
+      ```
+
+   10. Allow Minio to scrape its own metrics
+       Set 2 environment variables on the MinIO application configuration:
+
+       TrueNAS GUI > Apps > Applications > MINIO > Edit
+
+         Minio Image Environment
+         Set the following two environment variables:
+         MINIO_PROMETHEUS_URL  --> `https://prometheus.${SECRET_DOMAIN}`
+         MINIO_PROMETHEUS_JOB_ID --> job name (`truenas-minio`)
+
+Refs:
+<!-- markdownlint-disable MD034 -->
+- https://www.truenas.com/community/threads/truenas-scale-s3-service-to-minio-application-migration.110787/
+- https://www.truenas.com/docs/scale/scaletutorials/apps/communityapps/minioclustersscale/minioclustering/
+- https://www.truenas.com/docs/scale/scaletutorials/apps/communityapps/minioclustersscale/miniomanualupdate/
 <!-- markdownlint-enable -->
 
 #### Enable WebDav share to host files
