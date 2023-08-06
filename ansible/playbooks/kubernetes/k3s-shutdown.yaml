@@ -1,0 +1,56 @@
+---
+- name: Cluster shutdown with k3s-killall
+  hosts:
+    - controller
+    - worker
+  become: true
+  gather_facts: true
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Pausing for 5 seconds...
+      ansible.builtin.pause:
+        seconds: 5
+  tasks:
+    - name: Ensure k3s service is stopped
+      ansible.builtin.systemd:
+        name: k3s
+        state: stopped
+        enabled: true
+      when: k3s_non_root is not defined or not k3s_non_root
+      become: "{{ k3s_become }}"
+
+    - name: Ensure k3s service is stopped
+      ansible.builtin.systemd:
+        name: k3s
+        state: stopped
+        enabled: true
+        scope: user
+      when:
+        - k3s_non_root is defined
+        - k3s_non_root
+      become: "{{ k3s_become }}"
+
+    - name: Check to see if k3s-killall.sh exits
+      ansible.builtin.stat:
+        path: /usr/local/bin/k3s-killall.sh
+      register: check_k3s_killall_script
+
+    - name: Run k3s-killall.sh
+      ansible.builtin.command:
+        cmd: /usr/local/bin/k3s-killall.sh
+      register: k3s_killall
+      changed_when: k3s_killall.rc == 0
+      timeout: 360 # 5 min
+      when: check_k3s_killall_script.stat.exists
+      become: "{{ k3s_become }}"
+      ignore_errors: true
+      # notify: Shutdown
+
+    - name: Shutdown
+      community.general.shutdown:
+        msg: Shutting down
+
+  # handlers:
+  #   - name: Shutdown
+  #     community.general.shutdown:
+  #       msg: Shutting down

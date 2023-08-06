@@ -69,14 +69,23 @@ govc find -type s
 
 ## Ansible
 
-1. Install [ansible](https://docs.ansible.com/ansible/latest/index.html)
-2. Update Ansible requirements
+1. Install [pipx](https://github.com/pypa/pipx)
+
+2. Install [ansible](https://docs.ansible.com/ansible/latest/index.html)
+
+   ```sh
+   pipx install --include-deps ansible
+   # inject 'docker' and 'kubernetes' pkgs into 'ansible' namespace
+   pipx inject ansible docker kubernetes
+   ```
+
+3. Update Ansible requirements
 
    ```sh
    ansible-galaxy install -r ./ansible/requirements.yaml --force
    ```
 
-3. Update python requirements
+4. Update python requirements
 
    ```sh
    # pip3 install -r ./ansible/requirements.txt
