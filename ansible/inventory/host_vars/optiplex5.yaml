@@ -4,4 +4,5 @@ mac: 08:92:04:d8:10:fc
 disk: nvme0n1
 network_interface: enp2s0
 # storage: /dev/sda
-rook_block_device: "/dev/disk/by-id/ata-SATA_SSD_22010312000028"
+ceph_drives:
+  - "/dev/disk/by-id/ata-SATA_SSD_22010312000028"
