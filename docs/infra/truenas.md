@@ -96,6 +96,9 @@ Refs:
    3. `Set ACL` -> Use ACL Preset `POSIX - Restricted`
 4. Create `SMB` share pointing to `timemachine` dataset; set as `multi-user time machine` share
 5. Restart SMB server
+6. Set quota on Mac for auto pruning:
+   1. Identify `timemachine` destination ID: `tmutil destinationinfo`
+   2. Set quota: `sudo tmutil setquota <DESTINATION_ID> <QUOTA_IN_GB>`
 
 Refs:
 <!-- markdownlint-disable MD034 -->
