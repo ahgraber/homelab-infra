@@ -12,8 +12,8 @@ daily_iso_url: "https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/curren
 # daily_iso_checksum: "https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/SHA256SUMS" # then grep the correct sha
 
 ## pxe
-pxe_iso_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/iso/ubuntu-22.04.1-live-server-amd64.iso"
-pxe_cloudconfig_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init/" # trailing slash is important!
+pxe_iso_url: "https://truenas.ninerealmlabs.dev:8081/pxeboot/iso/ubuntu-22.04.1-live-server-amd64.iso"
+pxe_cloudconfig_url: "https://truenas.ninerealmlabs.dev:8081/pxeboot/cloud-init/" # trailing slash is important!
 
 # # focal (20.04) --------------------------------------------------------------
 # os_codename: "focal"
@@ -29,5 +29,5 @@ pxe_cloudconfig_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init/
 # # daily_iso_checksum: "https://cdimage.ubuntu.com/ubuntu-server/focal/daily-live/current/SHA256SUMS" # then grep the correct sha
 
 # ## pxe
-# pxe_iso_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/iso/ubuntu-20.04.4-live-server-amd64.iso"
-# pxe_cloudconfig_url: "https://truenas.ninerealmlabs.com:8081/pxeboot/cloud-init/" # trailing slash is important!
+# pxe_iso_url: "https://truenas.ninerealmlabs.dev:8081/pxeboot/iso/ubuntu-20.04.4-live-server-amd64.iso"
+# pxe_cloudconfig_url: "https://truenas.ninerealmlabs.dev:8081/pxeboot/cloud-init/" # trailing slash is important!
