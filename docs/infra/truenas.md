@@ -299,7 +299,7 @@ Refs:
 > See [pxe.md](../pxe.md)
 >
 > 1. Create `pxeboot` dataset
-> 2. Create `webdav` share for `pxeboot` dataset
+> 2. Create `webdav` share for `pxeboot` dataset (NOTE: TrueNAS now requires WebDAV install as container app)
 
 ## Troubleshooting
 
