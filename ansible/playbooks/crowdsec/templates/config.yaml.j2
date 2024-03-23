@@ -38,6 +38,7 @@ api:
     insecure_skip_verify: false
     credentials_path: /etc/crowdsec/local_api_credentials.yaml
   server:
+    enable: false  # using distributed/central server for LAPI
     log_level: info
 {% if cs_multiserver %}
     # listen_uri: {{ cs_delegate_server_listen_uri }}
